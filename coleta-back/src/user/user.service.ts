@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import CreateUserDto from './dto/CreateUser.dto';
+import SignUpDto from './dto/SignUp.dto';
+import SignInDto from './dto/SignIn.dto';
 
 @Injectable()
 export class UserService {
     constructor(private readonly prisma: PrismaService) {}
-    async createUser(dto: CreateUserDto) {
+
+    async signUp(dto: SignUpDto) {
         if (dto.password !== dto.confirmPassword) {
             throw new Error('Passwords do not match');
         }
@@ -16,5 +18,23 @@ export class UserService {
                 password: dto.password,
             }
         })
+    }
+
+    async signIn(dto: SignInDto) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                email: dto.email
+            }
+        })
+        
+        if(!user) {
+            throw new Error("Email or Password not valid")
+        }
+
+        if(user.password !== dto.password) {
+            throw new Error("Email or password not valid")
+        }
+
+        return user
     }
 }

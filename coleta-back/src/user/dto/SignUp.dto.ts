@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString, IsStrongPassword, MaxLength, MinLength } from "class-validator";
 
-class CreateUserDto {
+class SignUpDto {
     @IsString()
     @IsNotEmpty()
     @MaxLength(50)
@@ -30,4 +30,4 @@ class CreateUserDto {
     confirmPassword!: string
 }
 
-export default CreateUserDto;
+export default SignUpDto
