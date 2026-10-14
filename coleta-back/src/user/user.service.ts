@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import SignUpDto from './dto/SignUp.dto';
 import SignInDto from './dto/SignIn.dto';
@@ -12,6 +12,7 @@ export class UserService {
     if (dto.password !== dto.confirmPassword) {
       throw new Error('Passwords do not match');
     }
+
     const hashedPassword = await b.hash(dto.password, 10);
 
     return await this.prisma.user.create({
@@ -34,8 +35,10 @@ export class UserService {
       throw new Error('Email or Password not valid');
     }
 
-    if (user.password !== dto.password) {
-      throw new Error('Email or password not valid');
+    const passwordMatch = await b.compare(dto.password, user.password);
+
+    if (!passwordMatch) {
+      throw new UnauthorizedException('Email or password not valid');
     }
 
     return user;
