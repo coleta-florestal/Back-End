@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString, IsStrongPassword, MaxLength, MinLength } from "class-validator";
 
-class SignUpDto {
+export class SignUpDto {
     @IsString()
     @IsNotEmpty()
     @MaxLength(50)
@@ -14,14 +14,14 @@ class SignUpDto {
     
     @IsString()
     @IsNotEmpty()
+    @MinLength(8)
     @IsStrongPassword({
-        minLength: 8,
         minUppercase: 1,
         minLowercase: 1,
         minSymbols: 1,
         minNumbers: 1
     }, {
-        message: "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one symbol, one number"
+        message: "Password must contain at least one uppercase letter, one lowercase letter, one symbol and one number"
     })
     password!: string
     
@@ -29,5 +29,3 @@ class SignUpDto {
     @IsNotEmpty()
     confirmPassword!: string
 }
-
-export default SignUpDto
