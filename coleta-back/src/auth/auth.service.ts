@@ -1,8 +1,9 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { SignUpDto } from './dto/SignUp.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as b from "bcrypt"
+import { SignInDto } from './dto/SignIn.dto';
 
 
 @Injectable()
@@ -30,6 +31,29 @@ export class AuthService {
             }
             throw error
         }
-        return "ok"
+    }
+
+    async singin(dto: SignInDto) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                email: dto.email
+            }
+        })
+        
+        if (!user) {
+            throw new UnauthorizedException({
+                message: "Invalid credentials"
+            })
+        }
+
+        const passwordMatches = await b.compare(dto.password, user.password)
+
+        if(!passwordMatches) {
+            throw new UnauthorizedException({
+                message: "Invalid credentials"
+            })
+        }
+
+        return user
     }
 }
