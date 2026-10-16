@@ -1,14 +1,22 @@
 import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { SignUpDto } from './dto/SignUp.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
+
 import { PrismaService } from 'src/prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
+
 import * as b from "bcrypt"
+
+import { SignUpDto } from './dto/SignUp.dto';
 import { SignInDto } from './dto/SignIn.dto';
+import { PayloadDto } from './dto/payload.dto';
 
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly jwt: JwtService
+    ) {}
 
     async signup(dto: SignUpDto) {
         try {
@@ -20,7 +28,8 @@ export class AuthService {
                     password: hashedPassword
                 }
             })
-            return user
+
+            return this.signToken({id: user.id, email: user.email, role: user.role})
         } catch (error) {
             if (error instanceof PrismaClientKnownRequestError) {
                 if (error.code === "P2002") {
@@ -54,6 +63,20 @@ export class AuthService {
             })
         }
 
-        return user
+        return this.signToken({id: user.id, email: user.email, role: user.role})
+    }
+
+    async signToken({id, email, role}: PayloadDto): Promise<{ access_token: string }> {
+        const payload = {
+            sub: id,
+            email: email,
+            role: role
+        }
+
+        const token = await this.jwt.sign(payload)
+
+        return {
+            access_token: token
+        }
     }
 }
