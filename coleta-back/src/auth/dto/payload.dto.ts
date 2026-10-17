@@ -5,7 +5,7 @@ export class PayloadDto {
     @IsUUID()
     @IsNotEmpty()
     @IsString()
-    id!: string
+    sub!: string
 
     @IsEmail()
     @IsNotEmpty()

@@ -8,7 +8,7 @@ import * as b from "bcrypt"
 
 import { SignUpDto } from './dto/SignUp.dto';
 import { SignInDto } from './dto/SignIn.dto';
-import { PayloadDto } from './dto/payload.dto';
+import { PayloadDto } from './dto/Payload.dto';
 
 
 @Injectable()
@@ -29,7 +29,7 @@ export class AuthService {
                 }
             })
 
-            return this.signToken({id: user.id, email: user.email, role: user.role})
+            return this.signToken({sub: user.id, email: user.email, role: user.role})
         } catch (error) {
             if (error instanceof PrismaClientKnownRequestError) {
                 if (error.code === "P2002") {
@@ -63,12 +63,12 @@ export class AuthService {
             })
         }
 
-        return this.signToken({id: user.id, email: user.email, role: user.role})
+        return this.signToken({sub: user.id, email: user.email, role: user.role})
     }
 
-    async signToken({id, email, role}: PayloadDto): Promise<{ access_token: string }> {
+    async signToken({sub, email, role}: PayloadDto): Promise<{ access_token: string }> {
         const payload = {
-            sub: id,
+            sub: sub,
             email: email,
             role: role
         }
