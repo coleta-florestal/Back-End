@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate prisma client
+      - name: Generate prisma
         run: npx prisma generate
 
       - name: Lint
