@@ -32,7 +32,7 @@ export class AuthService {
             return this.signToken({sub: user.id, email: user.email, role: user.role})
         } catch (error) {
             if (error instanceof PrismaClientKnownRequestError) {
-                if (error.code === "P2022") {
+                if (error.code === "P2002") {
                     throw new ForbiddenException({
                         message: "This email has been already used"
                     })
