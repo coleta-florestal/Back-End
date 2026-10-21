@@ -1,4 +1,4 @@
-name: ci
+name: ci-tests
 
 on:
   - pull_request
@@ -7,6 +7,26 @@ permissions:
   contents: read
 
 jobs:
+  secret:
+    name: Check out secret
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog Secret Scanner
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.pull_request.base.sha }}
+          head: ${{ github.event.pull_request.head.sha }}
+          extra_args: --debug --only-verified
+          
   validate:
     name: Lint and tests
     runs-on: ubuntu-latest
