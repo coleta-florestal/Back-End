@@ -7,6 +7,10 @@ import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategy/jwt.strategy';
 
+import { APP_GUARD } from '@nestjs/core';
+import { JwtGuard } from './guard/jwt.guard';
+import { RolesGuard } from './guard/roles.guard';
+
 @Module({
   imports: [
     JwtModule.registerAsync({
@@ -16,13 +20,19 @@ import { JwtStrategy } from './strategy/jwt.strategy';
         return {
           secret: config.get("JWT_SECRET"),
           signOptions: {
-            expiresIn: "15m"
+            expiresIn: "15m",
+            algorithm: "HS256"
           }
         }
       }
     })
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy]
+  providers: [
+    AuthService, 
+    JwtStrategy,
+    { provide: APP_GUARD, useClass: JwtGuard },
+    { provide: APP_GUARD, useClass: RolesGuard }
+  ]
 })
 export class AuthModule {}
