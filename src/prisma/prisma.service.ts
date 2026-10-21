@@ -4,17 +4,22 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from 'src/generated/prisma/client';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
-    constructor(config: ConfigService) {
-        const adapter = new PrismaPg({ connectionString: config.get("DATABASE_URL") })
-        super({ adapter: adapter })
-    }
-    
-    async onModuleInit() {
-        await this.$connect()
-    }
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
+  constructor(config: ConfigService) {
+    const adapter = new PrismaPg({
+      connectionString: config.get('DATABASE_URL'),
+    });
+    super({ adapter: adapter });
+  }
 
-    async onModuleDestroy() {
-        await this.$disconnect()
-    }
+  async onModuleInit() {
+    await this.$connect();
+  }
+
+  async onModuleDestroy() {
+    await this.$disconnect();
+  }
 }

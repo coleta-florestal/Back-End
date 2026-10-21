@@ -7,15 +7,15 @@ import { Public } from './decorator/public.decorator';
 @Public()
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
-    @Post('signup')
-    signup(@Body() dto: SignUpDto) {
-        return this.authService.signup(dto)
-    }
+  @Post('signup')
+  signup(@Body() dto: SignUpDto) {
+    return this.authService.signup(dto);
+  }
 
-    @Post('signin')
-    signIn(@Body() dto: SignInDto) {
-        return this.authService.singin(dto)
-    }
+  @Post('signin')
+  signIn(@Body() dto: SignInDto) {
+    return this.authService.singin(dto);
+  }
 }
