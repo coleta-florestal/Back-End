@@ -20,6 +20,8 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
+          persist-credencial: true
           
       - name: Set up node
         uses: actions/setup-node@v6
