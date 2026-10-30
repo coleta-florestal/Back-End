@@ -16,6 +16,7 @@ datasource db {
 enum Role {
   USER
   ADMIN
+  SUPER_ADMIN
 }
 
 model User {
@@ -30,4 +31,64 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("users")
+}
+
+model Farm {
+  id String @id @default(uuid())
+  name String
+  address String?
+
+  plots Plot[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("farms")
+}
+
+model Plot {
+  id String @id @default(uuid())
+  name String 
+  areaHa Float? @map("area_ha")
+
+  farmId String @map("farm_id")
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  subPlots SubPlot[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("plots")
+}
+
+model SubPlot {
+  id String @id @default(uuid())
+  number Int
+  areaM2 Float? @map("area_m2")
+
+  plotId String @map("plot_id")
+  plot Plot @relation(fields: [plotId], references: [id], onDelete: Cascade)
+
+  trees Tree[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("subplots")
+}
+
+model Tree {
+  id           String   @id @default(uuid())
+  number       Int?     
+  diameterDapCm  Float    @map("diameter_dap_cm")
+  height       Float   
+  condition    String?
+
+  subPlotId String @map("sub_plot_id")
+  subPlot SubPlot @relation(fields: [subPlotId], references: [id], onDelete: Cascade)
+
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("trees")
 }
