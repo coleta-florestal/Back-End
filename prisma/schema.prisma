@@ -38,6 +38,8 @@ model Farm {
   name String
   address String?
 
+  plots Plot[]
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
