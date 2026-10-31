@@ -19,6 +19,17 @@ enum Role {
   SUPER_ADMIN
 }
 
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -29,8 +40,10 @@ model User {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  accountStatus AccountStatus @default(ACTIVE) @map("account_status")
 
   @@map("users")
+  status UserStatus @default(PENDING)
 }
 
 model Farm {
