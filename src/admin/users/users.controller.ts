@@ -10,7 +10,7 @@ import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 
 import type { User } from 'src/generated/prisma/client';
 
-@Controller('users')
+@Controller('admin/users')
 @Roles(Role.ADMIN, Role.SUPER_ADMIN)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
