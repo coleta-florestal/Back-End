@@ -8,15 +8,20 @@ import {
   ParseUUIDPipe,
   Patch,
 } from '@nestjs/common';
+
 import { GetUser } from 'src/auth/decorator/currentUser.decorator';
 import { Roles } from 'src/auth/decorator/roles.decorator';
+
 import type { User } from 'src/generated/prisma/client';
 import { Role } from 'src/generated/prisma/enums';
-import { UpdateUserDto } from './dto/update-user.dto';
+
+import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 import { UsersService } from './users.service';
 
+import { ApproveUserDto } from './dto/approve-user.dto';
+
 @Roles(Role.ADMIN, Role.SUPER_ADMIN)
-@Controller('users')
+@Controller('admin/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -25,18 +30,37 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('pending')
+  findPending() {
+    return this.usersService.findPending();
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.findOne(id);
   }
 
-  @Patch(':id')
-  update(
+  @Patch(':id/role')
+  updateRole(
     @GetUser() actor: User,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: UpdateUserDto,
+    @Body() dto: UpdateUserRoleDto,
   ) {
-    return this.usersService.update(actor, id, dto);
+    return this.usersService.updateRole(actor, id, dto);
+  }
+
+  @Patch(':id/approve')
+  approve(
+    @GetUser() actor: User,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: ApproveUserDto,
+  ) {
+    return this.usersService.approve(actor, id, dto.role);
+  }
+
+  @Patch(':id/reject')
+  reject(@Param('id', ParseUUIDPipe) id: string) {
+    return this.usersService.reject(id);
   }
 
   @Delete(':id')
