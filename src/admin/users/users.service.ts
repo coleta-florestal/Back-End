@@ -45,6 +45,7 @@ export class UsersService {
     const user = await this.prisma.user.findFirst({
       where: {
         OR: [{ email: identifier }, { name: { contains: identifier, mode: 'insensitive' } }],
+        status: UserStatus.APPROVED,
       },
       omit: {
         password: true,
@@ -52,7 +53,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     return user;
@@ -60,13 +61,13 @@ export class UsersService {
 
   // Altera somente o papel do usuário
   async updateRole(actor: User, id: string, dto: UpdateUserRoleDto) {
-    const target = await this.findById(id);
+    const user = await this.findById(id);
 
-    if (target.status !== UserStatus.APPROVED) {
+    if (user.status !== UserStatus.APPROVED) {
       throw new ConflictException('User is not approved');
     }
 
-    if (target.role === Role.SUPER_ADMIN) {
+    if (user.role === Role.SUPER_ADMIN) {
       throw new ForbiddenException('The SUPER_ADMIN role cannot be changed');
     }
 
@@ -74,7 +75,7 @@ export class UsersService {
       throw new ForbiddenException('ADMIN can only assign USER role');
     }
 
-    return this.prisma.user.update({
+    return await this.prisma.user.update({
       where: { id },
       data: { role: dto.role },
       omit: { password: true },
@@ -141,17 +142,17 @@ export class UsersService {
 
   // Método interno para alterar o status da conta
   private async changeAccountStatus(id: string, accountStatus: AccountStatus) {
-    const target = await this.findById(id);
+    const user = await this.findById(id);
 
-    if (target.status !== UserStatus.APPROVED) {
+    if (user.status !== UserStatus.APPROVED) {
       throw new ConflictException('User is not approved');
     }
 
-    if (target.role === Role.SUPER_ADMIN) {
+    if (user.role === Role.SUPER_ADMIN) {
       throw new ForbiddenException('The SUPER_ADMIN account cannot be modified');
     }
 
-    if (target.accountStatus === accountStatus) {
+    if (user.accountStatus === accountStatus) {
       throw new ConflictException(`User account is already ${accountStatus.toLowerCase()}`);
     }
 
@@ -189,7 +190,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     return user;

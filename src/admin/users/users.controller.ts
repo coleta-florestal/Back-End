@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
 
 import { Role } from 'src/generated/prisma/enums';
 
@@ -9,6 +9,7 @@ import { ApproveUserDto } from './dto/approve-user.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 
 import type { User } from 'src/generated/prisma/client';
+import { GetUser } from 'src/auth/decorator/currentUser.decorator';
 
 @Controller('admin/users')
 @Roles(Role.ADMIN, Role.SUPER_ADMIN)
@@ -35,14 +36,14 @@ export class UsersController {
 
   // Altera o papel do usuário
   @Patch(':id/role')
-  updateRole(@Req() req: { user: User }, @Param('id') id: string, @Body() dto: UpdateUserRoleDto) {
-    return this.usersService.updateRole(req.user, id, dto);
+  updateRole(@GetUser() user: User, @Param('id') id: string, @Body() dto: UpdateUserRoleDto) {
+    return this.usersService.updateRole(user, id, dto);
   }
 
   // Aprova uma solicitação
   @Patch(':id/approve')
-  approve(@Req() req: { user: User }, @Param('id') id: string, @Body() dto: ApproveUserDto) {
-    return this.usersService.approve(req.user, id, dto);
+  approve(@GetUser() user: User, @Param('id') id: string, @Body() dto: ApproveUserDto) {
+    return this.usersService.approve(user, id, dto);
   }
 
   // Recusa uma solicitação
