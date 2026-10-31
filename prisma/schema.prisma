@@ -19,6 +19,12 @@ enum Role {
   SUPER_ADMIN
 }
 
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -31,6 +37,7 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("users")
+  status UserStatus @default(PENDING)
 }
 
 model Farm {
