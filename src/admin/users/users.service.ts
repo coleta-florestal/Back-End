@@ -17,34 +17,17 @@ import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Lista usuários aprovados e permite busca por nome ou email
-  findAll(search?: string) {
-    const term = search?.trim();
-
+  async findAll() {
     return this.prisma.user.findMany({
       where: {
         status: UserStatus.APPROVED,
-        ...(term
-          ? {
-              OR: [
-                {
-                  name: {
-                    contains: term,
-                    mode: 'insensitive',
-                  },
-                },
-                {
-                  email: {
-                    contains: term,
-                    mode: 'insensitive',
-                  },
-                },
-              ],
-            }
-          : {}),
       },
-      omit: { password: true },
-      orderBy: { name: 'asc' },
+      omit: {
+        password: true,
+      },
+      orderBy: {
+        name: 'asc',
+      },
     });
   }
 
@@ -57,15 +40,19 @@ export class UsersService {
     });
   }
 
-  // Busca usuário por ID
-  async findOne(id: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-      omit: { password: true },
+  // Busca usuário por Email ou Nome
+  async findOne(identifier: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        OR: [{ email: identifier }, { name: { contains: identifier, mode: 'insensitive' } }],
+      },
+      omit: {
+        password: true,
+      },
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Usuário não encontrado');
     }
 
     return user;
