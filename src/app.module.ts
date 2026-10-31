@@ -6,7 +6,13 @@ import { FarmModule } from './farm/farm.module';
 import { ProfileModule } from './profile/profile.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule, AuthModule, FarmModule, ProfileModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule,
+    AuthModule,
+    FarmModule,
+    ProfileModule,
+  ],
   controllers: [],
   providers: [],
 })
