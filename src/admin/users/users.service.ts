@@ -6,20 +6,45 @@ import {
 } from '@nestjs/common';
 
 import type { User } from 'src/generated/prisma/client';
-import { Role, UserStatus } from 'src/generated/prisma/enums';
+import { AccountStatus, Role, UserStatus } from 'src/generated/prisma/enums';
+
 import { PrismaService } from 'src/prisma/prisma.service';
 
+import { ApproveUserDto } from './dto/approve-user.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Lista usuários aprovados
-  findAll() {
+  // Lista usuários aprovados e permite busca por nome ou email
+  findAll(search?: string) {
+    const term = search?.trim();
+
     return this.prisma.user.findMany({
-      where: { status: UserStatus.APPROVED },
+      where: {
+        status: UserStatus.APPROVED,
+        ...(term
+          ? {
+              OR: [
+                {
+                  name: {
+                    contains: term,
+                    mode: 'insensitive',
+                  },
+                },
+                {
+                  email: {
+                    contains: term,
+                    mode: 'insensitive',
+                  },
+                },
+              ],
+            }
+          : {}),
+      },
       omit: { password: true },
+      orderBy: { name: 'asc' },
     });
   }
 
@@ -28,6 +53,7 @@ export class UsersService {
     return this.prisma.user.findMany({
       where: { status: UserStatus.PENDING },
       omit: { password: true },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -58,7 +84,7 @@ export class UsersService {
     }
 
     if (actor.role === Role.ADMIN && dto.role !== Role.USER) {
-      throw new ForbiddenException('ADMIN cannot assign elevated roles');
+      throw new ForbiddenException('ADMIN can only assign USER role');
     }
 
     return this.prisma.user.update({
@@ -69,8 +95,8 @@ export class UsersService {
   }
 
   // Aprova uma solicitação de acesso
-  async approve(actor: User, id: string, role: Role) {
-    if (actor.role === Role.ADMIN && role !== Role.USER) {
+  async approve(actor: User, id: string, dto: ApproveUserDto) {
+    if (actor.role === Role.ADMIN && dto.role !== Role.USER) {
       throw new ForbiddenException('ADMIN can only approve users as USER');
     }
 
@@ -81,7 +107,8 @@ export class UsersService {
       },
       data: {
         status: UserStatus.APPROVED,
-        role,
+        accountStatus: AccountStatus.ACTIVE,
+        role: dto.role,
       },
     });
 
@@ -93,6 +120,7 @@ export class UsersService {
 
     return this.findOne(id);
   }
+
   // Recusa uma solicitação de acesso
   async reject(id: string) {
     const result = await this.prisma.user.updateMany({
@@ -114,7 +142,40 @@ export class UsersService {
     return { message: 'User request rejected successfully' };
   }
 
-  // Remove um usuário aprovado
+  // Ativa uma conta
+  async activate(id: string) {
+    return this.changeAccountStatus(id, AccountStatus.ACTIVE);
+  }
+
+  // Desativa uma conta
+  async deactivate(id: string) {
+    return this.changeAccountStatus(id, AccountStatus.INACTIVE);
+  }
+
+  // Método interno para alterar o status da conta
+  private async changeAccountStatus(id: string, accountStatus: AccountStatus) {
+    const target = await this.findOne(id);
+
+    if (target.status !== UserStatus.APPROVED) {
+      throw new ConflictException('User is not approved');
+    }
+
+    if (target.role === Role.SUPER_ADMIN) {
+      throw new ForbiddenException('The SUPER_ADMIN account cannot be modified');
+    }
+
+    if (target.accountStatus === accountStatus) {
+      throw new ConflictException(`User account is already ${accountStatus.toLowerCase()}`);
+    }
+
+    return this.prisma.user.update({
+      where: { id },
+      data: { accountStatus },
+      omit: { password: true },
+    });
+  }
+
+  // Remove permanentemente um usuário
   async remove(id: string) {
     const target = await this.findOne(id);
 
