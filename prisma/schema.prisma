@@ -19,6 +19,11 @@ enum Role {
   SUPER_ADMIN
 }
 
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+}
+
 enum UserStatus {
   PENDING
   APPROVED
@@ -35,6 +40,7 @@ model User {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  accountStatus AccountStatus @default(ACTIVE) @map("account_status")
 
   @@map("users")
   status UserStatus @default(PENDING)
