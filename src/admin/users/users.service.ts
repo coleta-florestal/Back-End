@@ -60,7 +60,7 @@ export class UsersService {
 
   // Altera somente o papel do usuário
   async updateRole(actor: User, id: string, dto: UpdateUserRoleDto) {
-    const target = await this.findOne(id);
+    const target = await this.findById(id);
 
     if (target.status !== UserStatus.APPROVED) {
       throw new ConflictException('User is not approved');
@@ -100,12 +100,12 @@ export class UsersService {
     });
 
     if (result.count === 0) {
-      await this.findOne(id);
+      await this.findById(id);
 
       throw new ConflictException('User does not have a pending request');
     }
 
-    return this.findOne(id);
+    return this.findById(id);
   }
 
   // Recusa uma solicitação de acesso
@@ -121,7 +121,7 @@ export class UsersService {
     });
 
     if (result.count === 0) {
-      await this.findOne(id);
+      await this.findById(id);
 
       throw new ConflictException('User does not have a pending request');
     }
@@ -141,7 +141,7 @@ export class UsersService {
 
   // Método interno para alterar o status da conta
   private async changeAccountStatus(id: string, accountStatus: AccountStatus) {
-    const target = await this.findOne(id);
+    const target = await this.findById(id);
 
     if (target.status !== UserStatus.APPROVED) {
       throw new ConflictException('User is not approved');
@@ -164,7 +164,7 @@ export class UsersService {
 
   // Remove permanentemente um usuário
   async remove(id: string) {
-    const target = await this.findOne(id);
+    const target = await this.findById(id);
 
     if (target.role === Role.SUPER_ADMIN) {
       throw new ForbiddenException('The SUPER_ADMIN cannot be removed');
@@ -177,5 +177,21 @@ export class UsersService {
     await this.prisma.user.delete({
       where: { id },
     });
+  }
+
+  // Busca usuário por ID (uso interno)
+  private async findById(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      omit: {
+        password: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    return user;
   }
 }
