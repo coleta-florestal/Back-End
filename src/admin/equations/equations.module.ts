@@ -4,6 +4,6 @@ import { EquationsService } from './equations.service';
 
 @Module({
   controllers: [EquationsController],
-  providers: [EquationsService]
+  providers: [EquationsService],
 })
 export class EquationsModule {}

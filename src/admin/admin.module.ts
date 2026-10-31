@@ -6,6 +6,6 @@ import { ValidationsModule } from './validations/validations.module';
 import { AuditModule } from './audit/audit.module';
 
 @Module({
-  imports: [UsersModule, ProjectsModule, EquationsModule, ValidationsModule, AuditModule]
+  imports: [UsersModule, ProjectsModule, EquationsModule, ValidationsModule, AuditModule],
 })
 export class AdminModule {}
