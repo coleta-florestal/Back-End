@@ -5,6 +5,6 @@ import { SubplotsModule } from './subplots/subplots.module';
 import { TreesModule } from './trees/trees.module';
 
 @Module({
-  imports: [FarmModule, FarmsModule, PlotsModule, SubplotsModule, TreesModule],
+  imports: [FarmsModule, PlotsModule, SubplotsModule, TreesModule],
 })
 export class FarmModule {}
