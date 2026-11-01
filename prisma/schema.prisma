@@ -19,6 +19,17 @@ enum Role {
   SUPER_ADMIN
 }
 
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -29,6 +40,9 @@ model User {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  status        UserStatus    @default(PENDING)
+  accountStatus AccountStatus @default(ACTIVE) @map("account_status")
 
   @@map("users")
 }
@@ -91,4 +105,28 @@ model Tree {
   createdAt    DateTime @default(now()) @map("created_at")
 
   @@map("trees")
+}
+
+enum EquationType {
+  SCHUMACHER_HALL
+  SPURR
+  HUSCH
+}
+
+model VolumetricEquation {
+  id String @id @default(uuid())
+
+  name String
+  modelType EquationType @map("model_type")
+
+  beta0 Float
+  beta1 Float
+  beta2 Float?
+
+  isActive Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("volumetric_equations")
 }
