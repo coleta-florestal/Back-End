@@ -123,6 +123,9 @@ model VolumetricEquation {
   beta1 Float
   beta2 Float?
 
+  r2        Float?
+  syx       Float?
+
   isActive Boolean @default(true) @map("is_active")
 
   createdAt DateTime @default(now()) @map("created_at")
