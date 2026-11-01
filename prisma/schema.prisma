@@ -95,7 +95,7 @@ model Tree {
   id           String   @id @default(uuid())
   number       Int?     
   diameterDapCm  Float    @map("diameter_dap_cm")
-  height       Float   
+  height       Float?   
   condition    String?
 
   subPlotId String @map("sub_plot_id")
