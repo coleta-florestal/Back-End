@@ -30,6 +30,18 @@ enum UserStatus {
   REJECTED
 }
 
+enum PlotStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  FINISHED
+}
+
+enum SubPlotStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  CLOSED
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -63,6 +75,7 @@ model Plot {
   id String @id @default(uuid())
   name String 
   areaHa Float? @map("area_ha")
+  status PlotStatus @default(NOT_STARTED)
 
   farmId String @map("farm_id")
   farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
@@ -79,6 +92,7 @@ model SubPlot {
   id String @id @default(uuid())
   number Int
   areaM2 Float? @map("area_m2")
+  status SubPlotStatus @default(NOT_STARTED)
 
   plotId String @map("plot_id")
   plot Plot @relation(fields: [plotId], references: [id], onDelete: Cascade)
