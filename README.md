@@ -41,3 +41,10 @@ a aplicação deles no cadastro das árvores faz parte dessa integração.
 
 Em um ambiente de desenvolvimento configurado, aplique a migração antes de usar as
 rotas, com `npm run db:deploy` (o Prisma utiliza `DIRECT_URL`).
+
+### Verificação
+
+Execute `npm test -- --runInBand`, `npm run build`, `npm run lint` e `npx prisma validate`.
+Os testes de validações usam o Prisma simulado e exercitam os guards reais de JWT e
+permissões, sem acessar um banco externo. A migração ainda deve ser verificada em um
+PostgreSQL de desenvolvimento antes da integração.
