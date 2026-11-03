@@ -32,7 +32,10 @@ export class EquationsService {
 
     return this.prisma.volumetricEquation.create({
       data: {
-        ...dto,
+        name: dto.name,
+        modelType: dto.modelType,
+        beta0: dto.beta0,
+        beta1: dto.beta1,
         beta2: dto.modelType === EquationType.SCHUMACHER_HALL ? dto.beta2! : null,
       },
     });
@@ -74,7 +77,10 @@ export class EquationsService {
     return this.prisma.volumetricEquation.update({
       where: { id },
       data: {
-        ...dto,
+        name: dto.name ?? equation.name,
+        modelType: dto.modelType ?? equation.modelType,
+        beta0: dto.beta0 ?? equation.beta0,
+        beta1: dto.beta1 ?? equation.beta1,
         beta2: modelType === EquationType.SCHUMACHER_HALL ? beta2 : null,
       },
     });
