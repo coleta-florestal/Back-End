@@ -15,4 +15,5 @@ export class FarmsController {
     findAll(@Query("search") search?: string) {
         return this.farmService.findAll(search)
     }
+
 }
