@@ -106,18 +106,30 @@ model SubPlot {
   @@map("subplots")
 }
 
+enum TreeQuality {
+  NORMAL
+  BIFURCADA
+  DOMINADA
+  MORTA
+  QUEBRADA
+  PRAGA_DOENCA
+}
+
 model Tree {
-  id           String   @id @default(uuid())
-  number       Int?     
-  diameterDapCm  Float    @map("diameter_dap_cm")
-  height       Float?   
-  condition    String?
+  id            String      @id @default(uuid())
+  number        Int
+  diameterDapCm Float       @map("diameter_dap_cm")
+  height        Float?
+  quality       TreeQuality @default(NORMAL)
+  observations  String?
 
-  subPlotId String @map("sub_plot_id")
-  subPlot SubPlot @relation(fields: [subPlotId], references: [id], onDelete: Cascade)
+  subPlotId String  @map("sub_plot_id")
+  subPlot   SubPlot @relation(fields: [subPlotId], references: [id], onDelete: Cascade)
 
-  createdAt    DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
+  @@unique([subPlotId, number])
   @@map("trees")
 }
 
