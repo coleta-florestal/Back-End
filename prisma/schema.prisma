@@ -112,3 +112,16 @@ model Tree {
 
   @@map("trees")
 }
+
+model ValidationSettings {
+  id         Int   @id @default(1)
+  minDapCm   Float @map("min_dap_cm")
+  maxDapCm   Float @map("max_dap_cm")
+  minHeightM Float @map("min_height_m")
+  maxHeightM Float @map("max_height_m")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("validation_settings")
+}
