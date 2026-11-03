@@ -69,7 +69,7 @@ model Farm {
 model Plot {
   id String @id @default(uuid())
   name String 
-  areaHa Float? @map("area_ha")
+  areaHa Float @map("area_ha")
   description String?
 
   farmId String @map("farm_id")
