@@ -25,6 +25,7 @@ export class PlotsService {
                 },
                 name: true,
                 areaHa: true,
+                status: true,
                 description: true,
                 createdAt: true
             }
