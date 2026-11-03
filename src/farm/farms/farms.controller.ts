@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { FarmsService } from './farms.service';
 import { CreateFarmDto } from './dto/CreateFarm.dto';
+import { Roles } from 'src/auth/decorator/roles.decorator';
+import { Role } from 'src/generated/prisma/enums';
 
 @Controller('farms')
 export class FarmsController {
@@ -16,4 +18,9 @@ export class FarmsController {
         return this.farmService.findAll(search)
     }
 
+    @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+    @Delete(":id")
+    remove(@Param("id") id: string) {
+        return this.farmService.remove(id)
+    }
 }

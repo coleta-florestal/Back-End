@@ -33,4 +33,13 @@ export class FarmsService {
             }
         })
     }
+
+    async remove(id: string) {
+        
+        await this.prisma.farm.delete({
+            where: {
+                id: id
+            }
+        })
+    }
 }
