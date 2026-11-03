@@ -2,16 +2,16 @@ import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { PlotsService } from './plots.service';
 import { CreatePlotDto } from './dto/CreatePlot.dto';
 
-@Controller('farms')
+@Controller('farms/:farmId/plots')
 export class PlotsController {
     constructor(private readonly plotsService: PlotsService) {}
 
-    @Get(":farmId")
+    @Get()
     findAll(@Param("farmId") farmId: string, @Query("search") search?: string) {
         return this.plotsService.findAll(farmId, search)
     }
 
-    @Post(":farmId")
+    @Post()
     create(@Param("farmId") farmId: string, @Body() dto: CreatePlotDto) {
         return this.plotsService.create(farmId, dto)
     }
