@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { FarmsService } from './farms.service';
 import { CreateFarmDto } from './dto/CreateFarm.dto';
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { Role } from 'src/generated/prisma/enums';
+import { UpdateFarmDto } from './dto/UpdateFarm.dto';
 
 @Controller('farms')
 export class FarmsController {
@@ -16,6 +17,12 @@ export class FarmsController {
     @Get("")
     findAll(@Query("search") search?: string) {
         return this.farmService.findAll(search)
+    }
+
+    @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+    @Patch(":id")
+    update(@Param("id") id: string, @Body() dto: UpdateFarmDto) {
+        return this.farmService.update(id, dto)
     }
 
     @Roles(Role.ADMIN, Role.SUPER_ADMIN)
