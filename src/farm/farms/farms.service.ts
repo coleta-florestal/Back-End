@@ -19,6 +19,19 @@ export class FarmsService {
         return farm
     }
 
+    async findAdmin() {
+        return await this.prisma.user.findMany({
+            where: {
+                OR: [ { role: 'ADMIN' }, { role: 'SUPER_ADMIN' } ] 
+            },
+            select: {
+                id: true,
+                role: true,
+                name: true
+            }
+        })
+    }
+
     async findAll(search?: string) {
         const whereClause = search ? { contains: search, mode: "insensitive" as const } : {}
 

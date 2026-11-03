@@ -19,6 +19,11 @@ export class FarmsController {
         return this.farmService.findAll(search)
     }
 
+    @Get("admin_owners")
+    getAdminOwners() {
+        return this.farmService.findAdmin()
+    }
+
     @Roles(Role.ADMIN, Role.SUPER_ADMIN)
     @Patch(":id")
     update(@Param("id") id: string, @Body() dto: UpdateFarmDto) {
