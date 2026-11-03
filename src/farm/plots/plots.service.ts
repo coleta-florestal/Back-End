@@ -7,7 +7,7 @@ export class PlotsService {
     constructor(private readonly prisma: PrismaService) {}
 
     async findAll(farmId: string, search?: string) {
-        await this.findOne(farmId)
+        await this.findFarm(farmId)
 
         const whereClause = search ? { contains: search, mode: "insensitive" as const } : {}
 
@@ -20,6 +20,7 @@ export class PlotsService {
                 id: true,
                 farm: {
                     select: {
+                        id: true,
                         name: true
                     }
                 },
@@ -32,7 +33,7 @@ export class PlotsService {
         })
     }
 
-    private async findOne(farmId: string) {
+    private async findFarm(farmId: string) {
         const farm = await this.prisma.farm.findUnique({
             where: {
                 id: farmId
@@ -48,8 +49,24 @@ export class PlotsService {
         return farm 
     }
 
+    private async findPlot(plotId: string) {
+        const plot = await this.prisma.plot.findUnique({
+            where: {
+                id: plotId
+            }
+        })
+
+        if (!plot) {
+            throw new BadRequestException({
+                message: "Plot not found"
+            })
+        }
+
+        return plot 
+    }
+
     async create(farmId: string, dto: CreatePlotDto) {
-        await this.findOne(farmId)
+        await this.findFarm(farmId)
 
         const plot = await this.prisma.plot.create({
             data: {
@@ -61,5 +78,16 @@ export class PlotsService {
         })
         
         return plot
+    }
+
+    async remove(farmId: string, plotId: string) {
+        await this.findFarm(farmId)
+        await this.findPlot(plotId)
+
+        await this.prisma.plot.delete({
+            where: {
+                id: plotId
+            }
+        })
     }
 }
