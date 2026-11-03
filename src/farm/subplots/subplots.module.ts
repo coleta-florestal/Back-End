@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { SubplotsService } from './subplots.service';
-import { SubplotsController } from './subplots.controller';
+import { SubPlotsService } from './subplots.service';
+import { SubPlotsController } from './subplots.controller';
 
 @Module({
-  providers: [SubplotsService],
-  controllers: [SubplotsController],
+  providers: [SubPlotsService],
+  controllers: [SubPlotsController],
 })
 export class SubplotsModule {}
