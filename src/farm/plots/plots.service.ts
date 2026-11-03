@@ -42,6 +42,7 @@ export class PlotsService {
             data: {
                 farmId: farmId,
                 name: dto.name,
+                areaHa: dto.area,
                 description: dto.description
             }
         })

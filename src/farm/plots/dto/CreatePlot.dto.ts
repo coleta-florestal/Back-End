@@ -1,4 +1,4 @@
-import { IsDecimal, IsNotEmpty, IsOptional, IsString } from "class-validator"
+import { IsDecimal, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
 
 export class CreatePlotDto {
     @IsNotEmpty()
@@ -11,5 +11,5 @@ export class CreatePlotDto {
 
     @IsDecimal()
     @IsNotEmpty()
-    area!: string
+    area!: number
 }
