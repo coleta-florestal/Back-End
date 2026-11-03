@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CreatePlotDto } from './dto/CreatePlot.dto';
 
 @Injectable()
 export class PlotsService {
@@ -32,5 +33,19 @@ export class PlotsService {
         }
 
         return farm 
+    }
+
+    async create(farmId: string, dto: CreatePlotDto) {
+        await this.findOne(farmId)
+
+        const plot = await this.prisma.plot.create({
+            data: {
+                farmId: farmId,
+                name: dto.name,
+                description: dto.description
+            }
+        })
+        
+        return plot
     }
 }
