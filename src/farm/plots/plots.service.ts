@@ -15,6 +15,18 @@ export class PlotsService {
             where: {
                 farmId: farmId,
                 name: whereClause
+            },
+            select: {
+                id: true,
+                farm: {
+                    select: {
+                        name: true
+                    }
+                },
+                name: true,
+                areaHa: true,
+                description: true,
+                createdAt: true
             }
         })
     }

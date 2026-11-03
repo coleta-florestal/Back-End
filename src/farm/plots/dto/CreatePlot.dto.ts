@@ -7,9 +7,9 @@ export class CreatePlotDto {
 
     @IsOptional()
     @IsString()
-    description!: string
+    description?: string
 
-    @IsDecimal()
+    @IsNumber()
     @IsNotEmpty()
     area!: number
 }
