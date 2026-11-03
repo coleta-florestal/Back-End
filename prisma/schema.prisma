@@ -70,6 +70,7 @@ model Plot {
   id String @id @default(uuid())
   name String 
   areaHa Float? @map("area_ha")
+  description String?
 
   farmId String @map("farm_id")
   farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
