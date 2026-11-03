@@ -1,19 +1,19 @@
-import { IsDate, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator"
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateFarmDto {
-    @IsString()
-    @IsNotEmpty()
-    name!: string
+  @IsString()
+  @IsNotEmpty()
+  name!: string;
 
-    @IsNotEmpty()
-    @IsString()
-    address!: string
+  @IsNotEmpty()
+  @IsString()
+  address!: string;
 
-    @IsNotEmpty()
-    @IsUUID()
-    ownerId!: string
+  @IsNotEmpty()
+  @IsUUID()
+  ownerId!: string;
 
-    @IsString()
-    @IsOptional()
-    description?: string
+  @IsString()
+  @IsOptional()
+  description?: string;
 }
