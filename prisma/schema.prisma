@@ -38,6 +38,8 @@ model User {
   name  String
   password  String
 
+  farms Farm[]
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   accountStatus AccountStatus @default(ACTIVE) @map("account_status")
@@ -50,6 +52,11 @@ model Farm {
   id String @id @default(uuid())
   name String
   address String?
+
+  description String?
+  
+  ownerId String @map("owner_id") 
+  owner User @relation(fields: [ownerId], references: [id])
 
   plots Plot[]
 
