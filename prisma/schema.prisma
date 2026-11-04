@@ -16,18 +16,154 @@ datasource db {
 enum Role {
   USER
   ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  role      Role     @default(USER)
+  id            String        @id @default(uuid())
+  email         String        @unique
+  role          Role          @default(USER)
+  name          String
+  password      String
 
-  name  String
-  password  String
+  farms Farm[]
+
+  accountStatus AccountStatus @default(ACTIVE) @map("account_status")
+  status UserStatus @default(PENDING)
+
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Farm {
+  id String @id @default(uuid())
+  name String
+  address String?
+
+  description String?
+  
+  ownerId String @map("owner_id") 
+  owner User @relation(fields: [ownerId], references: [id])
+
+  plots Plot[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@map("users")
+  @@map("farms")
+}
+
+enum PlotStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  FINISHED
+}
+
+model Plot {
+  id String @id @default(uuid())
+  name String 
+  areaHa Float @map("area_ha")
+  description String?
+
+  status PlotStatus @default(NOT_STARTED)
+
+  farmId String @map("farm_id")
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  subPlots SubPlot[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("plots")
+}
+
+enum SubPlotStatus {
+  OPEN
+  COMPLETED
+}
+
+model SubPlot {
+  id          String @id @default(uuid())
+  name      String
+  areaM2      Float? @map("area_m2")
+  targetTrees Int    @map("target_trees")
+
+  status     SubPlotStatus @default(OPEN)
+
+  plotId String @map("plot_id")
+  plot   Plot   @relation(fields: [plotId], references: [id], onDelete: Cascade)
+
+  trees Tree[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("subplots")
+}
+
+enum TreeQuality {
+  NORMAL
+  BIFURCADA
+  DOMINADA
+  MORTA
+  QUEBRADA
+  PRAGA_DOENCA
+}
+
+model Tree {
+  id            String      @id @default(uuid())
+  name        String
+  diameterDapCm Float       @map("diameter_dap_cm")
+  height        Float?
+  quality       TreeQuality @default(NORMAL)
+  observations  String?
+
+  subPlotId String  @map("sub_plot_id")
+  subPlot   SubPlot @relation(fields: [subPlotId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("trees")
+}
+
+enum EquationType {
+  SCHUMACHER_HALL
+  SPURR
+  HUSCH
+}
+
+model VolumetricEquation {
+  id String @id @default(uuid())
+
+  name String
+  modelType EquationType @map("model_type")
+
+  beta0 Float
+  beta1 Float
+  beta2 Float?
+
+  r2        Float?
+  syx       Float?
+
+  isActive Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("volumetric_equations")
 }
