@@ -39,8 +39,6 @@ model User {
 
   farms Farm[]
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
   accountStatus AccountStatus @default(ACTIVE) @map("account_status")
   status UserStatus @default(PENDING)
 
