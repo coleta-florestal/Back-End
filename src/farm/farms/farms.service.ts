@@ -48,10 +48,10 @@ export class FarmsService {
     });
   }
 
-  private async findById(id: string) {
+  async findFarm(farmId: string) {
     const farm = await this.prisma.farm.findUnique({
       where: {
-        id: id,
+        id: farmId,
       },
     });
     if (!farm) {
@@ -63,7 +63,7 @@ export class FarmsService {
   }
 
   async update(id: string, dto: UpdateFarmDto) {
-    await this.findById(id);
+    await this.findFarm(id);
     const farm = await this.prisma.farm.update({
       where: {
         id: id,
@@ -80,6 +80,8 @@ export class FarmsService {
   }
 
   async remove(id: string) {
+    await this.findFarm(id);
+
     await this.prisma.farm.delete({
       where: {
         id: id,
