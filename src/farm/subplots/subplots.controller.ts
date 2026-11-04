@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 
 import { SubPlotsService } from './subplots.service';
 import { CreateSubPlotDto } from './dto/create-subplot.dto';
@@ -14,17 +24,24 @@ export class SubPlotsController {
   }
 
   @Get()
-  findAll(@Param('plotId', ParseUUIDPipe) plotId: string, @Query("search") search?: string) {
+  findAll(@Param('plotId', ParseUUIDPipe) plotId: string, @Query('search') search?: string) {
     return this.subPlotsService.findAll(plotId, search);
   }
 
-  @Patch('/status')
-  updateStatus(@Param('plotId', ParseUUIDPipe) plotId: string, @Param("subPlotId", ParseUUIDPipe) subtPlotId: string, @Body() dto: UpdateSubPlotStatusDto) {
+  @Patch('status')
+  updateStatus(
+    @Param('plotId', ParseUUIDPipe) plotId: string,
+    @Param('subPlotId', ParseUUIDPipe) subtPlotId: string,
+    @Body() dto: UpdateSubPlotStatusDto,
+  ) {
     return this.subPlotsService.updateStatus(plotId, subtPlotId, dto.status);
   }
 
   @Delete()
-  remove(@Param('plotId', ParseUUIDPipe) plotId: string, @Param("subPlotId", ParseUUIDPipe) subtPlotId: string) {
+  remove(
+    @Param('plotId', ParseUUIDPipe) plotId: string,
+    @Param('subPlotId', ParseUUIDPipe) subtPlotId: string,
+  ) {
     return this.subPlotsService.remove(plotId, subtPlotId);
   }
 }

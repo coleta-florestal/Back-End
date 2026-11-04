@@ -110,7 +110,7 @@ enum TreeQuality {
 
 model Tree {
   id            String      @id @default(uuid())
-  number        Int
+  name        String
   diameterDapCm Float       @map("diameter_dap_cm")
   height        Float?
   quality       TreeQuality @default(NORMAL)
@@ -122,7 +122,6 @@ model Tree {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@unique([subPlotId, number])
   @@map("trees")
 }
 

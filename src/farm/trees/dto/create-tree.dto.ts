@@ -1,12 +1,12 @@
-import { IsEnum, IsInt, IsNumber, IsOptional, IsPositive, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString } from 'class-validator';
 
 import { TreeQuality } from 'src/generated/prisma/enums';
 
 export class CreateTreeDto {
   // Número de identificação da árvore.
-  @IsInt()
-  @IsPositive()
-  number!: number;
+  @IsNotEmpty()
+  @IsString()
+  name!: string;
 
   // Diâmetro à altura do peito, em centímetros.
   @IsNumber()
@@ -14,10 +14,9 @@ export class CreateTreeDto {
   diameterDapCm!: number;
 
   // Altura da árvore, em metros.
-  @IsOptional()
   @IsNumber()
   @IsPositive()
-  height?: number;
+  height!: number;
 
   // Classificação da qualidade da árvore.
   @IsOptional()

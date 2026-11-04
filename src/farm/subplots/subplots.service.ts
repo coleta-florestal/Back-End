@@ -1,4 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SubPlotStatus } from 'src/generated/prisma/enums';
@@ -10,25 +15,25 @@ export class SubPlotsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(plotId: string, dto: CreateSubPlotDto) {
-    await this.findPlot(plotId)
+    await this.findPlot(plotId);
 
     return this.prisma.subPlot.create({
       data: {
         plotId: plotId,
         name: dto.name,
         areaM2: dto.areaM2,
-        targetTrees: dto.targetTrees
-      }
+        targetTrees: dto.targetTrees,
+      },
     });
   }
 
   async findAll(plotId: string, search?: string) {
-    const whereClause = search ? { name: { contains: search, mode: "insensitive" as const } } : {}
+    const whereClause = search ? { name: { contains: search, mode: 'insensitive' as const } } : {};
 
     return this.prisma.subPlot.findMany({
       where: {
-        AND: [ whereClause, { plotId: plotId } ]
-      }
+        AND: [whereClause, { plotId: plotId }],
+      },
     });
   }
 
@@ -41,18 +46,17 @@ export class SubPlotsService {
       throw new NotFoundException('Talhão não encontrado.');
     }
 
-    return plot
+    return plot;
   }
 
   private async findSubPlot(plotId: string, subPlotId: string) {
     const subPlot = await this.prisma.subPlot.findFirst({
       where: {
-        AND: [{ id: subPlotId }, { plotId: plotId }]
+        AND: [{ id: subPlotId }, { plotId: plotId }],
       },
       select: {
         trees: true,
         targetTrees: true,
-        _count: true,
         id: true,
         name: true,
         status: true,
@@ -60,22 +64,22 @@ export class SubPlotsService {
         createdAt: true,
         plot: true,
         plotId: true,
-        syncStatus: true,
-        updatedAt: true
-      }
-    })
+        updatedAt: true,
+        _count: true,
+      },
+    });
 
     if (!subPlot) {
       throw new BadRequestException({
-        message: "Subplot was not found"
-      })
+        message: 'Subplot was not found',
+      });
     }
 
-    return subPlot
+    return subPlot;
   }
 
   async updateStatus(plotId: string, subPlotId: string, status: SubPlotStatus) {
-    const subPlot = await this.findSubPlot(plotId, subPlotId)
+    const subPlot = await this.findSubPlot(plotId, subPlotId);
 
     if (subPlot.status === status) {
       throw new ConflictException(
@@ -103,7 +107,7 @@ export class SubPlotsService {
   }
 
   async remove(plotId: string, subPlotId: string) {
-    await this.findSubPlot(plotId, subPlotId)
+    await this.findSubPlot(plotId, subPlotId);
 
     return this.prisma.subPlot.delete({
       where: { id: subPlotId },
