@@ -51,7 +51,12 @@ export class TreesService {
 
     const tree = await this.prisma.tree.findFirst({
       where: {
-        AND: [{ id: treeId }, { subPlotId: subPlotId }],
+        AND: [
+          { id: treeId },
+          { subPlotId: subPlotId },
+          { subPlot: { plotId: plotId } },
+          { subPlot: { plot: { farmId: farmId } } },
+        ],
       },
     });
 

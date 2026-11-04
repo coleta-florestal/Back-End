@@ -36,14 +36,14 @@ export class FarmsController {
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
-  @Patch(':id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateFarmDto) {
-    return this.farmService.update(id, dto);
+  @Patch(':famrId')
+  update(@Param('farmId', ParseUUIDPipe) farmId: string, @Body() dto: UpdateFarmDto) {
+    return this.farmService.update(farmId, dto);
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
-  @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.farmService.remove(id);
+  @Delete(':farmId')
+  remove(@Param('farmId', ParseUUIDPipe) farmId: string) {
+    return this.farmService.remove(farmId);
   }
 }

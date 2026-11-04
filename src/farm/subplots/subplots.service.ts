@@ -43,7 +43,7 @@ export class SubPlotsService {
 
     const subPlot = await this.prisma.subPlot.findFirst({
       where: {
-        AND: [{ id: subPlotId }, { plotId: plotId }],
+        AND: [{ id: subPlotId }, { plotId: plotId }, { plot: { farmId: farmId } }],
       },
       select: {
         trees: true,

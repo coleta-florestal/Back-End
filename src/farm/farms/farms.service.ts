@@ -62,11 +62,11 @@ export class FarmsService {
     return farm;
   }
 
-  async update(id: string, dto: UpdateFarmDto) {
-    await this.findFarm(id);
+  async update(farmId: string, dto: UpdateFarmDto) {
+    await this.findFarm(farmId);
     const farm = await this.prisma.farm.update({
       where: {
-        id: id,
+        id: farmId,
       },
       data: {
         name: dto.name,
@@ -79,12 +79,12 @@ export class FarmsService {
     return farm;
   }
 
-  async remove(id: string) {
-    await this.findFarm(id);
+  async remove(farmId: string) {
+    await this.findFarm(farmId);
 
     await this.prisma.farm.delete({
       where: {
-        id: id,
+        id: farmId,
       },
     });
   }
