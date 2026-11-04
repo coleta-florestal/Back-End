@@ -36,7 +36,7 @@ export class SubPlotsController {
     return this.subPlotsService.findAll(farmId, plotId, search);
   }
 
-  @Patch('status')
+  @Patch(':subPlotId/status')
   updateStatus(
     @Param('farmId', ParseUUIDPipe) farmId: string,
     @Param('plotId', ParseUUIDPipe) plotId: string,
