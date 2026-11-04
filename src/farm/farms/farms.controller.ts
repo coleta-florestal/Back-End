@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import { FarmsService } from './farms.service';
 import { CreateFarmDto } from './dto/CreateFarm.dto';
 import { Roles } from 'src/auth/decorator/roles.decorator';
@@ -10,7 +10,8 @@ export class FarmsController {
   constructor(private readonly farmService: FarmsService) {}
 
   @Get('')
-  findAll(@Query('search') search?: string) {
+  findAll(
+    @Query('search') search?: string) {
     return this.farmService.findAll(search);
   }
 
@@ -21,19 +22,23 @@ export class FarmsController {
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @Post('')
-  create(@Body() dto: CreateFarmDto) {
+  create(
+    @Body() dto: CreateFarmDto) {
     return this.farmService.create(dto);
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateFarmDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string, 
+    @Body() dto: UpdateFarmDto) {
     return this.farmService.update(id, dto);
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(
+    @Param('id', ParseUUIDPipe) id: string) {
     return this.farmService.remove(id);
   }
 }
