@@ -48,7 +48,7 @@ export class FarmsService {
     });
   }
 
-  async findById(id: string) {
+  private async findById(id: string) {
     const farm = await this.prisma.farm.findUnique({
       where: {
         id: id,

@@ -9,19 +9,22 @@ import { UpdateFarmDto } from './dto/UpdateFarm.dto';
 export class FarmsController {
   constructor(private readonly farmService: FarmsService) {}
 
-  @Post('')
-  create(@Body() dto: CreateFarmDto) {
-    return this.farmService.create(dto);
-  }
-
+  
   @Get('')
   findAll(@Query('search') search?: string) {
     return this.farmService.findAll(search);
   }
-
+  
   @Get('admin_owners')
   getAdminOwners() {
     return this.farmService.findAdmin();
+  }
+
+
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @Post('')
+  create(@Body() dto: CreateFarmDto) {
+    return this.farmService.create(dto);
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
