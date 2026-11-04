@@ -52,7 +52,7 @@ export class PlotsService {
   private async findPlot(farmId: string, plotId: string) {
     const plot = await this.prisma.plot.findFirst({
       where: {
-        AND: [{ id: plotId }, { farmId: farmId }]
+        AND: [{ id: plotId }, { farmId: farmId }],
       },
     });
 
