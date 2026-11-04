@@ -37,8 +37,12 @@ model User {
   name          String
   password      String
 
-  status        UserStatus    @default(PENDING)
+  farms Farm[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
   accountStatus AccountStatus @default(ACTIVE) @map("account_status")
+  status UserStatus @default(PENDING)
 
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @updatedAt @map("updated_at")
@@ -51,6 +55,11 @@ model Farm {
   name String
   address String?
 
+  description String?
+  
+  ownerId String @map("owner_id") 
+  owner User @relation(fields: [ownerId], references: [id])
+
   plots Plot[]
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -59,10 +68,19 @@ model Farm {
   @@map("farms")
 }
 
+enum PlotStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  FINISHED
+}
+
 model Plot {
   id String @id @default(uuid())
   name String 
-  areaHa Float? @map("area_ha")
+  areaHa Float @map("area_ha")
+  description String?
+
+  status PlotStatus @default(NOT_STARTED)
 
   farmId String @map("farm_id")
   farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
