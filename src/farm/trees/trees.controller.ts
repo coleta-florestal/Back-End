@@ -19,29 +19,43 @@ export class TreesController {
   constructor(private readonly treesService: TreesService) {}
 
   @Post()
-  create(@Param('subPlotId') subPlotId: string, @Body() dto: CreateTreeDto) {
-    return this.treesService.create(subPlotId, dto);
+  create(
+    @Param('farmId') farmId: string,
+    @Param('plotId') plotId: string,
+    @Param('subPlotId') subPlotId: string,
+    @Body() dto: CreateTreeDto,
+  ) {
+    return this.treesService.create(farmId, plotId, subPlotId, dto);
   }
 
   @Get()
-  findAll(@Param('subPlotId') subPlotId: string, @Query('search') search?: string) {
-    return this.treesService.findAll(subPlotId, search);
+  findAll(
+    @Param('farmId') farmId: string,
+    @Param('plotId') plotId: string,
+    @Param('subPlotId') subPlotId: string,
+    @Query('search') search?: string,
+  ) {
+    return this.treesService.findAll(farmId, plotId, subPlotId, search);
   }
 
   @Patch(':treeId')
   update(
+    @Param('farmId') farmId: string,
+    @Param('plotId') plotId: string,
     @Param('subplotId', ParseUUIDPipe) subPlotId: string,
     @Param('treeId', ParseUUIDPipe) treeId: string,
     @Body() dto: UpdateTreeDto,
   ) {
-    return this.treesService.update(subPlotId, treeId, dto);
+    return this.treesService.update(farmId, plotId, subPlotId, treeId, dto);
   }
 
   @Delete(':treeId')
   remove(
+    @Param('farmId') farmId: string,
+    @Param('plotId') plotId: string,
     @Param('subplotId', ParseUUIDPipe) subPlotId: string,
     @Param('treeId', ParseUUIDPipe) treeId: string,
   ) {
-    return this.treesService.remove(subPlotId, treeId);
+    return this.treesService.remove(farmId, plotId, subPlotId, treeId);
   }
 }

@@ -3,13 +3,17 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateTreeDto } from './dto/update-tree.dto';
 import { CreateTreeDto } from './dto/create-tree.dto';
+import { SubPlotsService } from '../subplots/subplots.service';
 
 @Injectable()
 export class TreesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly subPlotService: SubPlotsService,
+  ) {}
 
-  async create(subPlotId: string, dto: CreateTreeDto) {
-    await this.findSubPlot(subPlotId);
+  async create(farmId: string, plotId: string, subPlotId: string, dto: CreateTreeDto) {
+    await this.subPlotService.findSubPlot(farmId, plotId, subPlotId);
 
     const tree = await this.prisma.tree.create({
       data: {
@@ -25,35 +29,26 @@ export class TreesService {
     return tree;
   }
 
-  async findAll(subPlotId: string, search?: string) {
-    await this.findSubPlot(subPlotId);
+  async findAll(farmId: string, plotId: string, subPlotId: string, search?: string) {
+    await this.subPlotService.findSubPlot(farmId, plotId, subPlotId);
 
     const whereClause = search ? { name: { contains: search, mode: 'insensitive' as const } } : {};
 
     return this.prisma.tree.findMany({
       where: {
-        AND: [whereClause, { subPlotId: subPlotId }],
+        AND: [
+          whereClause,
+          { subPlotId: subPlotId },
+          { subPlot: { plotId: plotId } },
+          { subPlot: { plot: { farmId: farmId } } },
+        ],
       },
     });
   }
 
-  private async findSubPlot(subPlotId: string) {
-    const subPlot = await this.prisma.subPlot.findUnique({
-      where: {
-        id: subPlotId,
-      },
-    });
+  private async findTree(farmId: string, plotId: string, subPlotId: string, treeId: string) {
+    await this.subPlotService.findSubPlot(farmId, plotId, subPlotId);
 
-    if (!subPlot) {
-      throw new BadRequestException({
-        message: 'Subplot not found',
-      });
-    }
-
-    return subPlot;
-  }
-
-  private async findTree(subPlotId: string, treeId: string) {
     const tree = await this.prisma.tree.findFirst({
       where: {
         AND: [{ id: treeId }, { subPlotId: subPlotId }],
@@ -69,9 +64,14 @@ export class TreesService {
     return tree;
   }
 
-  async update(subPlotId: string, treeId: string, dto: UpdateTreeDto) {
-    await this.findSubPlot(subPlotId);
-    await this.findTree(subPlotId, treeId);
+  async update(
+    farmId: string,
+    plotId: string,
+    subPlotId: string,
+    treeId: string,
+    dto: UpdateTreeDto,
+  ) {
+    await this.findTree(farmId, plotId, subPlotId, treeId);
 
     return await this.prisma.tree.update({
       where: {
@@ -88,9 +88,8 @@ export class TreesService {
     });
   }
 
-  async remove(subPlotId: string, treeId: string) {
-    await this.findSubPlot(subPlotId);
-    await this.findTree(subPlotId, treeId);
+  async remove(farmId: string, plotId: string, subPlotId: string, treeId: string) {
+    await this.findTree(farmId, plotId, subPlotId, treeId);
 
     return this.prisma.tree.delete({
       where: { id: treeId },
