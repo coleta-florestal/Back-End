@@ -80,19 +80,13 @@ enum SubPlotStatus {
   COMPLETED
 }
 
-enum SyncSubPlotStatus {
-  SYNCED
-  NOT_SYNCED
-}
-
 model SubPlot {
   id          String @id @default(uuid())
-  number      Int
+  name      String
   areaM2      Float? @map("area_m2")
   targetTrees Int    @map("target_trees")
 
   status     SubPlotStatus @default(OPEN)
-  syncStatus SyncSubPlotStatus @default(NOT_SYNCED) @map("sync_status")
 
   plotId String @map("plot_id")
   plot   Plot   @relation(fields: [plotId], references: [id], onDelete: Cascade)
@@ -102,7 +96,6 @@ model SubPlot {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@unique([plotId, number])
   @@map("subplots")
 }
 

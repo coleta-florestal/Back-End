@@ -1,40 +1,30 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 
 import { SubPlotsService } from './subplots.service';
 import { CreateSubPlotDto } from './dto/create-subplot.dto';
 import { UpdateSubPlotStatusDto } from './dto/update-subplot-status.dto';
 
-@Controller('subplots')
+@Controller('farms/:farmId/plots/:plotId/subplots')
 export class SubPlotsController {
   constructor(private readonly subPlotsService: SubPlotsService) {}
 
-  // Cria uma parcela.
   @Post()
-  create(@Body() dto: CreateSubPlotDto) {
-    return this.subPlotsService.create(dto);
+  create(@Param('plotId', ParseUUIDPipe) plotId: string, @Body() dto: CreateSubPlotDto) {
+    return this.subPlotsService.create(plotId, dto);
   }
 
-  // Lista todas as parcelas de um talhão.
-  @Get('plot/:plotId')
-  findAll(@Param('plotId', ParseUUIDPipe) plotId: string) {
-    return this.subPlotsService.findAll(plotId);
+  @Get()
+  findAll(@Param('plotId', ParseUUIDPipe) plotId: string, @Query("search") search?: string) {
+    return this.subPlotsService.findAll(plotId, search);
   }
 
-  // Busca uma parcela específica.
-  @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.subPlotsService.findOne(id);
+  @Patch('/status')
+  updateStatus(@Param('plotId', ParseUUIDPipe) plotId: string, @Param("subPlotId", ParseUUIDPipe) subtPlotId: string, @Body() dto: UpdateSubPlotStatusDto) {
+    return this.subPlotsService.updateStatus(plotId, subtPlotId, dto.status);
   }
 
-  // Conclui ou reabre uma parcela.
-  @Patch(':id/status')
-  updateStatus(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateSubPlotStatusDto) {
-    return this.subPlotsService.updateStatus(id, dto.status);
-  }
-
-  // Exclui uma parcela.
-  @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.subPlotsService.remove(id);
+  @Delete()
+  remove(@Param('plotId', ParseUUIDPipe) plotId: string, @Param("subPlotId", ParseUUIDPipe) subtPlotId: string) {
+    return this.subPlotsService.remove(plotId, subtPlotId);
   }
 }

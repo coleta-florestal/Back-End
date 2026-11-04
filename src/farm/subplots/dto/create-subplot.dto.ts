@@ -1,9 +1,9 @@
 import { IsInt, IsNumber, IsPositive, IsString, IsNotEmpty } from 'class-validator';
 
 export class CreateSubPlotDto {
-  @IsInt()
-  @IsPositive()
-  number!: number;
+  @IsString()
+  @IsNotEmpty()
+  name!: string;
 
   @IsNumber()
   @IsPositive()
@@ -12,8 +12,4 @@ export class CreateSubPlotDto {
   @IsInt()
   @IsPositive()
   targetTrees!: number;
-
-  @IsString()
-  @IsNotEmpty()
-  plotId!: string;
 }
