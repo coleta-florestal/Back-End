@@ -66,10 +66,19 @@ model Farm {
   @@map("farms")
 }
 
+enum PlotStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  FINISHED
+}
+
 model Plot {
   id String @id @default(uuid())
   name String 
-  areaHa Float? @map("area_ha")
+  areaHa Float @map("area_ha")
+  description String?
+
+  status PlotStatus @default(NOT_STARTED)
 
   farmId String @map("farm_id")
   farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
