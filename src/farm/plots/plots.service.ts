@@ -49,10 +49,10 @@ export class PlotsService {
     return farm;
   }
 
-  private async findPlot(plotId: string) {
-    const plot = await this.prisma.plot.findUnique({
+  private async findPlot(farmId: string, plotId: string) {
+    const plot = await this.prisma.plot.findFirst({
       where: {
-        id: plotId,
+        AND: [{ id: plotId }, { farmId: farmId }]
       },
     });
 
@@ -82,7 +82,7 @@ export class PlotsService {
 
   async remove(farmId: string, plotId: string) {
     await this.findFarm(farmId);
-    await this.findPlot(plotId);
+    await this.findPlot(farmId, plotId);
 
     await this.prisma.plot.delete({
       where: {
