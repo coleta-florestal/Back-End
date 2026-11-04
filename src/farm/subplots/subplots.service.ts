@@ -1,21 +1,20 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SubPlotStatus } from 'src/generated/prisma/enums';
 
 import { CreateSubPlotDto } from './dto/create-subplot.dto';
+import { PlotsService } from '../plots/plots.service';
 
 @Injectable()
 export class SubPlotsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly plotService: PlotsService,
+  ) {}
 
-  async create(plotId: string, dto: CreateSubPlotDto) {
-    await this.findPlot(plotId);
+  async create(farmId: string, plotId: string, dto: CreateSubPlotDto) {
+    await this.plotService.findPlot(farmId, plotId);
 
     return this.prisma.subPlot.create({
       data: {
@@ -27,29 +26,21 @@ export class SubPlotsService {
     });
   }
 
-  async findAll(plotId: string, search?: string) {
+  async findAll(farmId: string, plotId: string, search?: string) {
+    await this.plotService.findPlot(farmId, plotId);
+
     const whereClause = search ? { name: { contains: search, mode: 'insensitive' as const } } : {};
 
     return this.prisma.subPlot.findMany({
       where: {
-        AND: [whereClause, { plotId: plotId }],
+        AND: [whereClause, { plotId: plotId }, { plot: { farmId: farmId } }],
       },
     });
   }
 
-  private async findPlot(plotId: string) {
-    const plot = await this.prisma.plot.findUnique({
-      where: { id: plotId },
-    });
+  async findSubPlot(farmId: string, plotId: string, subPlotId: string) {
+    await this.plotService.findPlot(farmId, plotId);
 
-    if (!plot) {
-      throw new NotFoundException('Talhão não encontrado.');
-    }
-
-    return plot;
-  }
-
-  private async findSubPlot(plotId: string, subPlotId: string) {
     const subPlot = await this.prisma.subPlot.findFirst({
       where: {
         AND: [{ id: subPlotId }, { plotId: plotId }],
@@ -78,8 +69,8 @@ export class SubPlotsService {
     return subPlot;
   }
 
-  async updateStatus(plotId: string, subPlotId: string, status: SubPlotStatus) {
-    const subPlot = await this.findSubPlot(plotId, subPlotId);
+  async updateStatus(farmId: string, plotId: string, subPlotId: string, status: SubPlotStatus) {
+    const subPlot = await this.findSubPlot(farmId, plotId, subPlotId);
 
     if (subPlot.status === status) {
       throw new ConflictException(
@@ -106,8 +97,8 @@ export class SubPlotsService {
     };
   }
 
-  async remove(plotId: string, subPlotId: string) {
-    await this.findSubPlot(plotId, subPlotId);
+  async remove(farmId: string, plotId: string, subPlotId: string) {
+    await this.findSubPlot(farmId, plotId, subPlotId);
 
     await this.prisma.subPlot.delete({
       where: { id: subPlotId },

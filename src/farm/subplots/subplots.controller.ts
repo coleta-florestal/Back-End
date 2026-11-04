@@ -19,29 +19,39 @@ export class SubPlotsController {
   constructor(private readonly subPlotsService: SubPlotsService) {}
 
   @Post()
-  create(@Param('plotId', ParseUUIDPipe) plotId: string, @Body() dto: CreateSubPlotDto) {
-    return this.subPlotsService.create(plotId, dto);
+  create(
+    @Param('farmId', ParseUUIDPipe) farmId: string,
+    @Param('plotId', ParseUUIDPipe) plotId: string,
+    @Body() dto: CreateSubPlotDto,
+  ) {
+    return this.subPlotsService.create(farmId, plotId, dto);
   }
 
   @Get()
-  findAll(@Param('plotId', ParseUUIDPipe) plotId: string, @Query('search') search?: string) {
-    return this.subPlotsService.findAll(plotId, search);
+  findAll(
+    @Param('farmId', ParseUUIDPipe) farmId: string,
+    @Param('plotId', ParseUUIDPipe) plotId: string,
+    @Query('search') search?: string,
+  ) {
+    return this.subPlotsService.findAll(farmId, plotId, search);
   }
 
   @Patch('status')
   updateStatus(
+    @Param('farmId', ParseUUIDPipe) farmId: string,
     @Param('plotId', ParseUUIDPipe) plotId: string,
     @Param('subPlotId', ParseUUIDPipe) subtPlotId: string,
     @Body() dto: UpdateSubPlotStatusDto,
   ) {
-    return this.subPlotsService.updateStatus(plotId, subtPlotId, dto.status);
+    return this.subPlotsService.updateStatus(farmId, plotId, subtPlotId, dto.status);
   }
 
   @Delete(':subPlotId')
   remove(
+    @Param('farmId', ParseUUIDPipe) farmId: string,
     @Param('plotId', ParseUUIDPipe) plotId: string,
     @Param('subPlotId', ParseUUIDPipe) subtPlotId: string,
   ) {
-    return this.subPlotsService.remove(plotId, subtPlotId);
+    return this.subPlotsService.remove(farmId, plotId, subtPlotId);
   }
 }
