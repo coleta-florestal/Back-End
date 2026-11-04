@@ -91,7 +91,7 @@ export class TreesService {
   async remove(farmId: string, plotId: string, subPlotId: string, treeId: string) {
     await this.findTree(farmId, plotId, subPlotId, treeId);
 
-    return this.prisma.tree.delete({
+    await this.prisma.tree.delete({
       where: { id: treeId },
     });
   }
