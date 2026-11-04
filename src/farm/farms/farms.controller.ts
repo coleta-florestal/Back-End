@@ -36,7 +36,7 @@ export class FarmsController {
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
-  @Patch(':famrId')
+  @Patch(':farmId')
   update(@Param('farmId', ParseUUIDPipe) farmId: string, @Body() dto: UpdateFarmDto) {
     return this.farmService.update(farmId, dto);
   }
