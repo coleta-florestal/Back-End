@@ -37,7 +37,7 @@ export class SubPlotsController {
     return this.subPlotsService.updateStatus(plotId, subtPlotId, dto.status);
   }
 
-  @Delete()
+  @Delete(':subPlotId')
   remove(
     @Param('plotId', ParseUUIDPipe) plotId: string,
     @Param('subPlotId', ParseUUIDPipe) subtPlotId: string,

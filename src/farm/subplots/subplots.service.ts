@@ -109,7 +109,7 @@ export class SubPlotsService {
   async remove(plotId: string, subPlotId: string) {
     await this.findSubPlot(plotId, subPlotId);
 
-    return this.prisma.subPlot.delete({
+    await this.prisma.subPlot.delete({
       where: { id: subPlotId },
     });
   }
