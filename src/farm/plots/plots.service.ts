@@ -1,13 +1,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePlotDto } from './dto/CreatePlot.dto';
+import { FarmsService } from '../farms/farms.service';
 
 @Injectable()
 export class PlotsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly farmService: FarmsService,
+  ) {}
 
   async findAll(farmId: string, search?: string) {
-    await this.findFarm(farmId);
+    await this.farmService.findFarm(farmId);
 
     const whereClause = search ? { contains: search, mode: 'insensitive' as const } : {};
 
@@ -33,23 +37,9 @@ export class PlotsService {
     });
   }
 
-  private async findFarm(farmId: string) {
-    const farm = await this.prisma.farm.findUnique({
-      where: {
-        id: farmId,
-      },
-    });
+  async findPlot(farmId: string, plotId: string) {
+    await this.farmService.findFarm(farmId);
 
-    if (!farm) {
-      throw new BadRequestException({
-        message: 'Farm not found',
-      });
-    }
-
-    return farm;
-  }
-
-  private async findPlot(farmId: string, plotId: string) {
     const plot = await this.prisma.plot.findFirst({
       where: {
         AND: [{ id: plotId }, { farmId: farmId }],
@@ -66,7 +56,7 @@ export class PlotsService {
   }
 
   async create(farmId: string, dto: CreatePlotDto) {
-    await this.findFarm(farmId);
+    await this.farmService.findFarm(farmId);
 
     const plot = await this.prisma.plot.create({
       data: {
@@ -81,7 +71,6 @@ export class PlotsService {
   }
 
   async remove(farmId: string, plotId: string) {
-    await this.findFarm(farmId);
     await this.findPlot(farmId, plotId);
 
     await this.prisma.plot.delete({
