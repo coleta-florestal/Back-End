@@ -11,5 +11,5 @@ export class CreatePlotDto {
 
   @IsNumber()
   @IsNotEmpty()
-  area!: number;
+  areaHA!: number;
 }
