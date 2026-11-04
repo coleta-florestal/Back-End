@@ -19,31 +19,31 @@ enum Role {
   SUPER_ADMIN
 }
 
-enum AccountStatus {
-  ACTIVE
-  INACTIVE
-}
-
 enum UserStatus {
   PENDING
   APPROVED
   REJECTED
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  role      Role     @default(USER)
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+}
 
-  name  String
-  password  String
+model User {
+  id            String        @id @default(uuid())
+  email         String        @unique
+  role          Role          @default(USER)
+  name          String
+  password      String
 
   farms Farm[]
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
   accountStatus AccountStatus @default(ACTIVE) @map("account_status")
   status UserStatus @default(PENDING)
+
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
 
   @@map("users")
 }
@@ -91,13 +91,21 @@ model Plot {
   @@map("plots")
 }
 
+enum SubPlotStatus {
+  OPEN
+  COMPLETED
+}
+
 model SubPlot {
-  id String @id @default(uuid())
-  number Int
-  areaM2 Float? @map("area_m2")
+  id          String @id @default(uuid())
+  name      String
+  areaM2      Float? @map("area_m2")
+  targetTrees Int    @map("target_trees")
+
+  status     SubPlotStatus @default(OPEN)
 
   plotId String @map("plot_id")
-  plot Plot @relation(fields: [plotId], references: [id], onDelete: Cascade)
+  plot   Plot   @relation(fields: [plotId], references: [id], onDelete: Cascade)
 
   trees Tree[]
 
@@ -107,17 +115,55 @@ model SubPlot {
   @@map("subplots")
 }
 
+enum TreeQuality {
+  NORMAL
+  BIFURCADA
+  DOMINADA
+  MORTA
+  QUEBRADA
+  PRAGA_DOENCA
+}
+
 model Tree {
-  id           String   @id @default(uuid())
-  number       Int?     
-  diameterDapCm  Float    @map("diameter_dap_cm")
-  height       Float   
-  condition    String?
+  id            String      @id @default(uuid())
+  name        String
+  diameterDapCm Float       @map("diameter_dap_cm")
+  height        Float?
+  quality       TreeQuality @default(NORMAL)
+  observations  String?
 
-  subPlotId String @map("sub_plot_id")
-  subPlot SubPlot @relation(fields: [subPlotId], references: [id], onDelete: Cascade)
+  subPlotId String  @map("sub_plot_id")
+  subPlot   SubPlot @relation(fields: [subPlotId], references: [id], onDelete: Cascade)
 
-  createdAt    DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("trees")
+}
+
+enum EquationType {
+  SCHUMACHER_HALL
+  SPURR
+  HUSCH
+}
+
+model VolumetricEquation {
+  id String @id @default(uuid())
+
+  name String
+  modelType EquationType @map("model_type")
+
+  beta0 Float
+  beta1 Float
+  beta2 Float?
+
+  r2        Float?
+  syx       Float?
+
+  isActive Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("volumetric_equations")
 }
