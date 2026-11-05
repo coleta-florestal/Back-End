@@ -1,3 +1,15 @@
+# [1.0.0-rc.2](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2026-11-05)
+
+### Features
+
+- **plot:** add new role requirement create, update and delete plots ([19dc692](https://github.com/coleta-florestal/Back-End/commit/19dc6925145b4abd2ccf8f41a8bb0f63ab61fa6c))
+- **plot:** create plot dto ([4fc908c](https://github.com/coleta-florestal/Back-End/commit/4fc908c86c4f26c559ccd03c7a312b473b705d6b))
+- **plot:** create update method and endpoint ([b3121a8](https://github.com/coleta-florestal/Back-End/commit/b3121a8d05d80e34a6a6fcdf8f7a80efd32371f0))
+- **subplot:** create update subplot method and endpoint ([c10113d](https://github.com/coleta-florestal/Back-End/commit/c10113d0465344f00b296eb38adc9287d818501e))
+- **subplots:** create update subplot dto ([7f13c40](https://github.com/coleta-florestal/Back-End/commit/7f13c40941bd90933a86f8b469c435f038830285))
+- **tree:** add validation of subplot status in create and delete methods ([01659ed](https://github.com/coleta-florestal/Back-End/commit/01659edf1e96b3b61c8f48001b6e56f68ebc8293))
+- **trees:** add validation to only update trees if the subplot is open ([12f0456](https://github.com/coleta-florestal/Back-End/commit/12f0456c313df14d02e46ff4fd36227950b3cec6))
+
 # 1.0.0-rc.1 (2026-11-04)
 
 ### Bug Fixes
