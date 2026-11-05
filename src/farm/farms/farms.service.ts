@@ -1,13 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateFarmDto } from './dto/CreateFarm.dto';
 import { UpdateFarmDto } from './dto/UpdateFarm.dto';
 
 @Injectable()
 export class FarmsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService
+  ) {}
 
-  async create(dto: CreateFarmDto) {
+  async create(
+    dto: CreateFarmDto) {
     const farm = await this.prisma.farm.create({
       data: {
         name: dto.name,
@@ -32,7 +35,8 @@ export class FarmsService {
     });
   }
 
-  async findAll(search?: string) {
+  async findAll(
+    search?: string) {
     const whereClause = search ? { contains: search, mode: 'insensitive' as const } : {};
 
     return await this.prisma.farm.findMany({
@@ -48,21 +52,24 @@ export class FarmsService {
     });
   }
 
-  async findFarm(farmId: string) {
+  async findFarm(
+    farmId: string) {
     const farm = await this.prisma.farm.findUnique({
       where: {
         id: farmId,
       },
     });
     if (!farm) {
-      throw new BadRequestException({
-        message: 'Farm was not found',
+      throw new NotFoundException({
+        message: 'Fazenda não encontrada',
       });
     }
     return farm;
   }
 
-  async update(farmId: string, dto: UpdateFarmDto) {
+  async update(
+    farmId: string, 
+    dto: UpdateFarmDto) {
     await this.findFarm(farmId);
     const farm = await this.prisma.farm.update({
       where: {
@@ -79,7 +86,8 @@ export class FarmsService {
     return farm;
   }
 
-  async remove(farmId: string) {
+  async remove(
+    farmId: string) {
     await this.findFarm(farmId);
 
     await this.prisma.farm.delete({

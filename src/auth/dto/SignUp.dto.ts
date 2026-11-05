@@ -31,7 +31,7 @@ export class SignUpDto {
     },
     {
       message:
-        'Password must contain at least one uppercase letter, one lowercase letter, one symbol and one number',
+        'Senha deve conter, pelo menos, 1 letra maiúscula, 1 símbolo e 1 número',
     },
   )
   password!: string;
