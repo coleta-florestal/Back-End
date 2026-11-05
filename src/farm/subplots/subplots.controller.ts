@@ -11,8 +11,9 @@ import {
 } from '@nestjs/common';
 
 import { SubPlotsService } from './subplots.service';
-import { CreateSubPlotDto } from './dto/create-subplot.dto';
-import { UpdateSubPlotStatusDto } from './dto/update-subplot-status.dto';
+
+import { CreateSubPlotDto } from './dto/CreateSubPlot.dto';
+import { UpdateSubPlotStatusDto } from './dto/UpdateSubPlotStatus.dto';
 import { UpdateSubPlotDto } from './dto/UpdateSubPlot.dto';
 
 @Controller('farms/:farmId/plots/:plotId/subplots')

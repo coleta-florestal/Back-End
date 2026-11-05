@@ -1,10 +1,11 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PlotsService } from '../plots/plots.service';
+
 import { SubPlotStatus } from 'src/generated/prisma/enums';
 
-import { CreateSubPlotDto } from './dto/create-subplot.dto';
-import { PlotsService } from '../plots/plots.service';
+import { CreateSubPlotDto } from './dto/CreateSubPlot.dto';
 import { UpdateSubPlotDto } from './dto/UpdateSubPlot.dto';
 
 @Injectable()
@@ -14,65 +15,37 @@ export class SubPlotsService {
     private readonly plotService: PlotsService,
   ) {}
 
-  async create(
-    farmId: string, 
-    plotId: string, 
-    dto: CreateSubPlotDto) {
-    await this.plotService.findPlot(farmId, plotId);
-
-    return this.prisma.subPlot.create({
-      data: {
-        plotId: plotId,
-        name: dto.name,
-        areaM2: dto.areaM2,
-        targetTrees: dto.targetTrees,
-      },
-    });
-  }
-
-  async findAll(
-    farmId: string, 
-    plotId: string, 
-    search?: string) {
+  async findAll(farmId: string, plotId: string, search?: string) {
     await this.plotService.findPlot(farmId, plotId);
 
     const whereClause = search ? { name: { contains: search, mode: 'insensitive' as const } } : {};
 
     return this.prisma.subPlot.findMany({
       where: {
-        AND: [
-          whereClause, 
-          { plotId: plotId }, 
-          { plot: { farmId: farmId } }],
+        AND: [whereClause, { plot: { id: plotId, farmId: farmId } }],
       },
     });
   }
 
-  async findSubPlot(
-    farmId: string, 
-    plotId: string, 
-    subPlotId: string) {
+  async findSubPlot(farmId: string, plotId: string, subPlotId: string) {
     await this.plotService.findPlot(farmId, plotId);
 
     const subPlot = await this.prisma.subPlot.findFirst({
       where: {
-        AND: [
-          { id: subPlotId }, 
-          { plotId: plotId }, 
-          { plot: { farmId: farmId } }],
+        AND: [{ id: subPlotId }, { plot: { id: plotId, farmId: farmId } }],
       },
       select: {
-        trees: true,
-        targetTrees: true,
         id: true,
-        name: true,
         status: true,
+        name: true,
+        _count: true,
         areaM2: true,
-        createdAt: true,
+        targetTrees: true,
+        trees: true,
         plot: true,
         plotId: true,
+        createdAt: true,
         updatedAt: true,
-        _count: true,
       },
     });
 
@@ -85,11 +58,20 @@ export class SubPlotsService {
     return subPlot;
   }
 
-  async updateStatus(
-    farmId: string, 
-    plotId: string, 
-    subPlotId: string, 
-    status: SubPlotStatus) {
+  async create(farmId: string, plotId: string, dto: CreateSubPlotDto) {
+    await this.plotService.findPlot(farmId, plotId);
+
+    return this.prisma.subPlot.create({
+      data: {
+        plotId: plotId,
+        name: dto.name,
+        areaM2: dto.areaM2,
+        targetTrees: dto.targetTrees,
+      },
+    });
+  }
+
+  async updateStatus(farmId: string, plotId: string, subPlotId: string, status: SubPlotStatus) {
     const subPlot = await this.findSubPlot(farmId, plotId, subPlotId);
 
     if (subPlot.status === status) {
@@ -100,13 +82,14 @@ export class SubPlotsService {
 
     const missingTrees = Math.max(subPlot.targetTrees - subPlot._count.trees, 0);
 
-    // Atualiza o status da parcela.
     const updatedSubPlot = await this.prisma.subPlot.update({
-      where: { id: subPlotId },
-      data: { status },
+      where: {
+        id: subPlotId,
+        plot: { id: plotId, farmId: farmId },
+      },
+      data: { status: status },
     });
 
-    // Retorna a parcela atualizada e informa se existem árvores faltantes.
     return {
       subPlot: updatedSubPlot,
       missingTrees,
@@ -117,18 +100,13 @@ export class SubPlotsService {
     };
   }
 
-  async update(
-    farmId: string, 
-    plotId: string, 
-    subPlotId: string, 
-    dto: UpdateSubPlotDto) {
+  async update(farmId: string, plotId: string, subPlotId: string, dto: UpdateSubPlotDto) {
     await this.findSubPlot(farmId, plotId, subPlotId);
 
     const subPlot = await this.prisma.subPlot.update({
       where: {
         id: subPlotId,
-        plotId: plotId,
-        plot: { farmId: farmId },
+        plot: { id: plotId, farmId: farmId },
       },
       data: {
         name: dto.name,
@@ -140,14 +118,14 @@ export class SubPlotsService {
     return subPlot;
   }
 
-  async remove(
-    farmId: string, 
-    plotId: string, 
-    subPlotId: string) {
+  async remove(farmId: string, plotId: string, subPlotId: string) {
     await this.findSubPlot(farmId, plotId, subPlotId);
 
     await this.prisma.subPlot.delete({
-      where: { id: subPlotId },
+      where: {
+        id: subPlotId,
+        plot: { id: plotId, farmId: farmId },
+      },
     });
   }
 }

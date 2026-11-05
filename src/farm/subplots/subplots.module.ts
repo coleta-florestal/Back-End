@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
-import { SubPlotsService } from './subplots.service';
-import { SubPlotsController } from './subplots.controller';
-import { PlotsService } from '../plots/plots.service';
 import { PlotsModule } from '../plots/plots.module';
-import { FarmsService } from '../farms/farms.service';
 import { FarmsModule } from '../farms/farms.module';
+
+import { SubPlotsController } from './subplots.controller';
+
+import { SubPlotsService } from './subplots.service';
+import { PlotsService } from '../plots/plots.service';
+import { FarmsService } from '../farms/farms.service';
 
 @Module({
   providers: [SubPlotsService, PlotsService, FarmsService],

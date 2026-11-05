@@ -30,8 +30,7 @@ export class SignUpDto {
       minNumbers: 1,
     },
     {
-      message:
-        'Senha deve conter, pelo menos, 1 letra maiúscula, 1 símbolo e 1 número',
+      message: 'Senha deve conter, pelo menos, 1 letra maiúscula, 1 símbolo e 1 número',
     },
   )
   password!: string;

@@ -9,11 +9,14 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+
 import { FarmsService } from './farms.service';
+
 import { CreateFarmDto } from './dto/CreateFarm.dto';
+import { UpdateFarmDto } from './dto/UpdateFarm.dto';
+
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { Role } from 'src/generated/prisma/enums';
-import { UpdateFarmDto } from './dto/UpdateFarm.dto';
 
 @Controller('farms')
 export class FarmsController {
