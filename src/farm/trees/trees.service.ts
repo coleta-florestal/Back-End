@@ -58,6 +58,9 @@ export class TreesService {
           { subPlot: { plot: { farmId: farmId } } },
         ],
       },
+      select: {
+        subPlot: true
+      }
     });
 
     if (!tree) {
@@ -76,7 +79,13 @@ export class TreesService {
     treeId: string,
     dto: UpdateTreeDto,
   ) {
-    await this.findTree(farmId, plotId, subPlotId, treeId);
+    const tree = await this.findTree(farmId, plotId, subPlotId, treeId);
+
+    if (tree.subPlot.status === "COMPLETED") {
+      throw new BadRequestException({
+        msg: "Subplot is completed, you can not edit trees anymore"
+      })
+    }
 
     return await this.prisma.tree.update({
       where: {
