@@ -15,6 +15,21 @@ export class TreesService {
   async create(farmId: string, plotId: string, subPlotId: string, dto: CreateTreeDto) {
     await this.subPlotService.findSubPlot(farmId, plotId, subPlotId);
 
+    const subPlot = await this.prisma.subPlot.findUnique({
+      where: {
+        id: subPlotId,
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    if (subPlot?.status === 'COMPLETED') {
+      throw new BadRequestException({
+        msg: 'Subplot is completed, you can not add trees anymore',
+      });
+    }
+
     const tree = await this.prisma.tree.create({
       data: {
         subPlotId: subPlotId,
@@ -103,7 +118,13 @@ export class TreesService {
   }
 
   async remove(farmId: string, plotId: string, subPlotId: string, treeId: string) {
-    await this.findTree(farmId, plotId, subPlotId, treeId);
+    const tree = await this.findTree(farmId, plotId, subPlotId, treeId);
+
+    if (tree.subPlot.status === 'COMPLETED') {
+      throw new BadRequestException({
+        msg: 'Subplot is completed, you can not delete trees anymore',
+      });
+    }
 
     await this.prisma.tree.delete({
       where: { id: treeId },
