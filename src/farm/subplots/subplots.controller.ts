@@ -13,6 +13,7 @@ import {
 import { SubPlotsService } from './subplots.service';
 import { CreateSubPlotDto } from './dto/create-subplot.dto';
 import { UpdateSubPlotStatusDto } from './dto/update-subplot-status.dto';
+import { UpdateSubPlotDto } from './dto/UpdateSubPlot.dto';
 
 @Controller('farms/:farmId/plots/:plotId/subplots')
 export class SubPlotsController {
@@ -44,6 +45,16 @@ export class SubPlotsController {
     @Body() dto: UpdateSubPlotStatusDto,
   ) {
     return this.subPlotsService.updateStatus(farmId, plotId, subtPlotId, dto.status);
+  }
+
+  @Patch(':subPlotId')
+  update(
+    @Param('farmId', ParseUUIDPipe) farmId: string,
+    @Param('plotId', ParseUUIDPipe) plotId: string,
+    @Param('subPlotId', ParseUUIDPipe) subtPlotId: string,
+    @Body() dto: UpdateSubPlotDto,
+  ) {
+    return this.subPlotsService.update(farmId, plotId, subtPlotId, dto)
   }
 
   @Delete(':subPlotId')
