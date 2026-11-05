@@ -5,6 +5,7 @@ import { SubPlotStatus } from 'src/generated/prisma/enums';
 
 import { CreateSubPlotDto } from './dto/create-subplot.dto';
 import { PlotsService } from '../plots/plots.service';
+import { UpdateSubPlotDto } from './dto/UpdateSubPlot.dto';
 
 @Injectable()
 export class SubPlotsService {
@@ -95,6 +96,25 @@ export class SubPlotsService {
           ? `A parcela ainda possui ${missingTrees} árvore(s) faltante(s) para atingir a meta.`
           : null,
     };
+  }
+
+  async update(farmId: string, plotId: string, subPlotId: string, dto: UpdateSubPlotDto) {
+    await this.findSubPlot(farmId, plotId, subPlotId);
+
+    const subPlot = await this.prisma.subPlot.update({
+      where: {
+        id: subPlotId,
+        plotId: plotId,
+        plot: { farmId: farmId },
+      },
+      data: {
+        name: dto.name,
+        targetTrees: dto.targetTrees,
+        areaM2: dto.areaM2,
+      },
+    });
+
+    return subPlot;
   }
 
   async remove(farmId: string, plotId: string, subPlotId: string) {

@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePlotDto } from './dto/CreatePlot.dto';
 import { FarmsService } from '../farms/farms.service';
+import { UpdatePlotDto } from './dto/UpdatePlot.dto';
 
 @Injectable()
 export class PlotsService {
@@ -61,6 +62,23 @@ export class PlotsService {
     const plot = await this.prisma.plot.create({
       data: {
         farmId: farmId,
+        name: dto.name,
+        areaHa: dto.areaHA,
+        description: dto.description,
+      },
+    });
+
+    return plot;
+  }
+
+  async update(farmId: string, plotId: string, dto: UpdatePlotDto) {
+    await this.findPlot(farmId, plotId);
+    const plot = await this.prisma.plot.update({
+      where: {
+        id: plotId,
+        farmId: farmId,
+      },
+      data: {
         name: dto.name,
         areaHa: dto.areaHA,
         description: dto.description,
