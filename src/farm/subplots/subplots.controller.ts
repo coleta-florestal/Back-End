@@ -54,7 +54,7 @@ export class SubPlotsController {
     @Param('subPlotId', ParseUUIDPipe) subtPlotId: string,
     @Body() dto: UpdateSubPlotDto,
   ) {
-    return this.subPlotsService.update(farmId, plotId, subtPlotId, dto)
+    return this.subPlotsService.update(farmId, plotId, subtPlotId, dto);
   }
 
   @Delete(':subPlotId')

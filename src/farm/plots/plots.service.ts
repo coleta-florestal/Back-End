@@ -43,9 +43,7 @@ export class PlotsService {
 
     const plot = await this.prisma.plot.findFirst({
       where: {
-        AND: [
-          { id: plotId }, 
-          { farmId: farmId }],
+        AND: [{ id: plotId }, { farmId: farmId }],
       },
     });
 
@@ -74,20 +72,20 @@ export class PlotsService {
   }
 
   async update(farmId: string, plotId: string, dto: UpdatePlotDto) {
-    await this.findPlot(farmId, plotId)
+    await this.findPlot(farmId, plotId);
     const plot = await this.prisma.plot.update({
       where: {
         id: plotId,
-        farmId: farmId
+        farmId: farmId,
       },
       data: {
         name: dto.name,
         areaHa: dto.areaHA,
-        description: dto.description
-      }
-    })
+        description: dto.description,
+      },
+    });
 
-    return plot
+    return plot;
   }
 
   async remove(farmId: string, plotId: string) {

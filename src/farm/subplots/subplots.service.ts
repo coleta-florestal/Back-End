@@ -44,10 +44,7 @@ export class SubPlotsService {
 
     const subPlot = await this.prisma.subPlot.findFirst({
       where: {
-        AND: [
-          { id: subPlotId }, 
-          { plotId: plotId }, 
-          { plot: { farmId: farmId } }],
+        AND: [{ id: subPlotId }, { plotId: plotId }, { plot: { farmId: farmId } }],
       },
       select: {
         trees: true,
@@ -102,22 +99,22 @@ export class SubPlotsService {
   }
 
   async update(farmId: string, plotId: string, subPlotId: string, dto: UpdateSubPlotDto) {
-    await this.findSubPlot(farmId, plotId, subPlotId)
+    await this.findSubPlot(farmId, plotId, subPlotId);
 
     const subPlot = await this.prisma.subPlot.update({
       where: {
         id: subPlotId,
         plotId: plotId,
-        plot: { farmId: farmId }
+        plot: { farmId: farmId },
       },
       data: {
         name: dto.name,
         targetTrees: dto.targetTrees,
-        areaM2: dto.areaM2
-      }
-    })
+        areaM2: dto.areaM2,
+      },
+    });
 
-    return subPlot
+    return subPlot;
   }
 
   async remove(farmId: string, plotId: string, subPlotId: string) {
