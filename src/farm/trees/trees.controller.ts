@@ -15,7 +15,7 @@ import { TreesService } from './trees.service';
 import { UpdateTreeDto } from './dto/UpdateTree.dto';
 import { CreateTreeDto } from './dto/CreateTree.dto';
 
-@Controller('farms/:farmId/plots/:plotId/subplots/:subPlotId/tree')
+@Controller('farms/:farmId/plots/:plotId/subplots/:subPlotId/trees')
 export class TreesController {
   constructor(private readonly treesService: TreesService) {}
 
