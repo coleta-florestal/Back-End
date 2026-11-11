@@ -5,6 +5,7 @@ import { AuthController } from './auth.controller';
 
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
+
 import { JwtStrategy } from './strategy/jwt.strategy';
 
 import { APP_GUARD } from '@nestjs/core';

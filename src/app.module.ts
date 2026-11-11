@@ -5,6 +5,8 @@ import { AuthModule } from './auth/auth.module';
 import { FarmModule } from './farm/farm.module';
 import { ProfileModule } from './profile/profile.module';
 import { AdminModule } from './admin/admin.module';
+import { ProcessingModule } from './processing/processing.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { AdminModule } from './admin/admin.module';
     FarmModule,
     ProfileModule,
     AdminModule,
+    ProcessingModule,
+    DashboardModule,
   ],
   controllers: [],
   providers: [],

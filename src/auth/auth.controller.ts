@@ -1,7 +1,10 @@
 import { Body, Controller, Post } from '@nestjs/common';
+
+import { AuthService } from './auth.service';
+
 import { SignUpDto } from './dto/SignUp.dto';
 import { SignInDto } from './dto/SignIn.dto';
-import { AuthService } from './auth.service';
+
 import { Public } from './decorator/public.decorator';
 
 @Public()

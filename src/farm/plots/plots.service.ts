@@ -1,7 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreatePlotDto } from './dto/CreatePlot.dto';
 import { FarmsService } from '../farms/farms.service';
+
+import { CreatePlotDto } from './dto/CreatePlot.dto';
 import { UpdatePlotDto } from './dto/UpdatePlot.dto';
 
 @Injectable()
@@ -48,8 +50,8 @@ export class PlotsService {
     });
 
     if (!plot) {
-      throw new BadRequestException({
-        message: 'Plot not found',
+      throw new NotFoundException({
+        message: 'Talhão não encontrado',
       });
     }
 
@@ -73,6 +75,7 @@ export class PlotsService {
 
   async update(farmId: string, plotId: string, dto: UpdatePlotDto) {
     await this.findPlot(farmId, plotId);
+
     const plot = await this.prisma.plot.update({
       where: {
         id: plotId,
@@ -94,6 +97,7 @@ export class PlotsService {
     await this.prisma.plot.delete({
       where: {
         id: plotId,
+        farmId: farmId,
       },
     });
   }

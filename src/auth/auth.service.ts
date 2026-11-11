@@ -37,7 +37,7 @@ export class AuthService {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           throw new ForbiddenException({
-            message: 'This email has been already used',
+            message: 'Esse email já está sendo usado',
           });
         }
       }
@@ -54,7 +54,7 @@ export class AuthService {
 
     if (!user) {
       throw new UnauthorizedException({
-        message: 'Invalid credentials',
+        message: 'Credenciais inválidas',
       });
     }
 
@@ -62,14 +62,14 @@ export class AuthService {
 
     if (!passwordMatches) {
       throw new UnauthorizedException({
-        message: 'Invalid credentials',
+        message: 'Credenciais inválidas',
       });
     }
 
     return this.signToken({ sub: user.id, email: user.email, role: user.role });
   }
 
-  signToken({ sub, email, role }: PayloadDto) {
+  private signToken({ sub, email, role }: PayloadDto) {
     const payload = {
       sub: sub,
       email: email,

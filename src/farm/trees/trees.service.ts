@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UpdateTreeDto } from './dto/update-tree.dto';
-import { CreateTreeDto } from './dto/create-tree.dto';
 import { SubPlotsService } from '../subplots/subplots.service';
+
+import { UpdateTreeDto } from './dto/UpdateTree.dto';
+import { CreateTreeDto } from './dto/CreateTree.dto';
 
 @Injectable()
 export class TreesService {
@@ -12,12 +13,46 @@ export class TreesService {
     private readonly subPlotService: SubPlotsService,
   ) {}
 
+  async findAll(farmId: string, plotId: string, subPlotId: string, search?: string) {
+    await this.subPlotService.findSubPlot(farmId, plotId, subPlotId);
+
+    const whereClause = search ? { name: { contains: search, mode: 'insensitive' as const } } : {};
+
+    return this.prisma.tree.findMany({
+      where: {
+        AND: [whereClause, { subPlot: { id: subPlotId, plot: { id: plotId, farmId: farmId } } }],
+      },
+    });
+  }
+
+  async findTree(farmId: string, plotId: string, subPlotId: string, treeId: string) {
+    await this.subPlotService.findSubPlot(farmId, plotId, subPlotId);
+
+    const tree = await this.prisma.tree.findFirst({
+      where: {
+        AND: [{ id: treeId }, { subPlot: { id: subPlotId, plot: { id: plotId, farmId: farmId } } }],
+      },
+      select: {
+        subPlot: true,
+      },
+    });
+
+    if (!tree) {
+      throw new NotFoundException({
+        message: 'Árvore não encontrada',
+      });
+    }
+
+    return tree;
+  }
+
   async create(farmId: string, plotId: string, subPlotId: string, dto: CreateTreeDto) {
     await this.subPlotService.findSubPlot(farmId, plotId, subPlotId);
 
     const subPlot = await this.prisma.subPlot.findUnique({
       where: {
         id: subPlotId,
+        plot: { id: plotId, farmId: farmId },
       },
       select: {
         status: true,
@@ -25,8 +60,8 @@ export class TreesService {
     });
 
     if (subPlot?.status === 'COMPLETED') {
-      throw new BadRequestException({
-        msg: 'Subplot is completed, you can not add trees anymore',
+      throw new ForbiddenException({
+        msg: 'A parcela foi concluída, você não pode adicionar mais árvores',
       });
     }
 
@@ -44,49 +79,6 @@ export class TreesService {
     return tree;
   }
 
-  async findAll(farmId: string, plotId: string, subPlotId: string, search?: string) {
-    await this.subPlotService.findSubPlot(farmId, plotId, subPlotId);
-
-    const whereClause = search ? { name: { contains: search, mode: 'insensitive' as const } } : {};
-
-    return this.prisma.tree.findMany({
-      where: {
-        AND: [
-          whereClause,
-          { subPlotId: subPlotId },
-          { subPlot: { plotId: plotId } },
-          { subPlot: { plot: { farmId: farmId } } },
-        ],
-      },
-    });
-  }
-
-  private async findTree(farmId: string, plotId: string, subPlotId: string, treeId: string) {
-    await this.subPlotService.findSubPlot(farmId, plotId, subPlotId);
-
-    const tree = await this.prisma.tree.findFirst({
-      where: {
-        AND: [
-          { id: treeId },
-          { subPlotId: subPlotId },
-          { subPlot: { plotId: plotId } },
-          { subPlot: { plot: { farmId: farmId } } },
-        ],
-      },
-      select: {
-        subPlot: true,
-      },
-    });
-
-    if (!tree) {
-      throw new BadRequestException({
-        message: 'Tree was not found',
-      });
-    }
-
-    return tree;
-  }
-
   async update(
     farmId: string,
     plotId: string,
@@ -97,15 +89,15 @@ export class TreesService {
     const tree = await this.findTree(farmId, plotId, subPlotId, treeId);
 
     if (tree.subPlot.status === 'COMPLETED') {
-      throw new BadRequestException({
-        msg: 'Subplot is completed, you can not edit trees anymore',
+      throw new ForbiddenException({
+        msg: 'A parcela foi concluída, você não pode mais editar as árvores',
       });
     }
 
     return await this.prisma.tree.update({
       where: {
         id: treeId,
-        subPlotId: subPlotId,
+        subPlot: { id: subPlotId, plot: { id: plotId, farmId: farmId } },
       },
       data: {
         name: dto.name,
@@ -121,13 +113,16 @@ export class TreesService {
     const tree = await this.findTree(farmId, plotId, subPlotId, treeId);
 
     if (tree.subPlot.status === 'COMPLETED') {
-      throw new BadRequestException({
-        msg: 'Subplot is completed, you can not delete trees anymore',
+      throw new ForbiddenException({
+        msg: 'A parcela foi concluída, você não pode mais deletar árvores',
       });
     }
 
     await this.prisma.tree.delete({
-      where: { id: treeId },
+      where: {
+        id: treeId,
+        subPlot: { id: subPlotId, plot: { id: plotId, farmId: farmId } },
+      },
     });
   }
 }

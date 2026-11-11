@@ -9,10 +9,14 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+
 import { PlotsService } from './plots.service';
+
 import { CreatePlotDto } from './dto/CreatePlot.dto';
+
 import { Roles } from 'src/auth/decorator/roles.decorator';
 import { Role } from 'src/generated/prisma/enums';
+import { UpdatePlotDto } from './dto/UpdatePlot.dto';
 
 @Controller('farms/:farmId/plots')
 export class PlotsController {
@@ -34,7 +38,7 @@ export class PlotsController {
   update(
     @Param('farmId', ParseUUIDPipe) farmId: string,
     @Param('plotId', ParseUUIDPipe) plotId: string,
-    @Body() dto: CreatePlotDto,
+    @Body() dto: UpdatePlotDto,
   ) {
     return this.plotsService.update(farmId, plotId, dto);
   }

@@ -11,10 +11,11 @@ import {
 } from '@nestjs/common';
 
 import { TreesService } from './trees.service';
-import { UpdateTreeDto } from './dto/update-tree.dto';
-import { CreateTreeDto } from './dto/create-tree.dto';
 
-@Controller('farms/:farmId/plots/:plotId/subplots/:subPlotId/tree')
+import { UpdateTreeDto } from './dto/UpdateTree.dto';
+import { CreateTreeDto } from './dto/CreateTree.dto';
+
+@Controller('farms/:farmId/plots/:plotId/subplots/:subPlotId/trees')
 export class TreesController {
   constructor(private readonly treesService: TreesService) {}
 
