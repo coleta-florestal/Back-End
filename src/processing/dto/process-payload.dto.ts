@@ -1,16 +1,22 @@
 import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  ArrayMinSize,
   IsArray,
   IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
   Min,
   ValidateNested,
 } from 'class-validator';
 import { TreeQuality } from 'src/generated/prisma/enums';
 import { ProcessInventoryDto } from './process-inventory.dto';
+
+const MAX_SUBPLOTS = 500;
+const MAX_TREES_PER_SUBPLOT = 1000;
 
 export class PayloadTreeDto {
   @IsOptional()
@@ -22,10 +28,12 @@ export class PayloadTreeDto {
   name?: string;
 
   @IsNumber()
+  @IsPositive()
   diameterDapCm!: number;
 
   @IsOptional()
   @IsNumber()
+  @IsPositive()
   heightM?: number;
 
   @IsOptional()
@@ -52,6 +60,7 @@ export class PayloadSubPlotDto {
   areaM2?: number;
 
   @IsArray()
+  @ArrayMaxSize(MAX_TREES_PER_SUBPLOT)
   @ValidateNested({ each: true })
   @Type(() => PayloadTreeDto)
   trees!: PayloadTreeDto[];
@@ -68,6 +77,8 @@ export class ProcessPayloadDto extends ProcessInventoryDto {
   plotAreaHa?: number;
 
   @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(MAX_SUBPLOTS)
   @ValidateNested({ each: true })
   @Type(() => PayloadSubPlotDto)
   subPlots!: PayloadSubPlotDto[];

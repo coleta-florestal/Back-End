@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EquationsService } from 'src/admin/equations/equations.service';
 import { StatisticsService } from './statistics.service';
-import { EquationType, TreeQuality } from 'src/generated/prisma/enums';
+import { EquationType, SubPlotStatus, TreeQuality } from 'src/generated/prisma/enums';
 import { ProcessInventoryDto } from './dto/process-inventory.dto';
 import { ProcessPayloadDto } from './dto/process-payload.dto';
 import {
@@ -75,9 +75,17 @@ export class ProcessingService {
       throw new BadRequestException('O talhão não possui parcelas cadastradas para processamento.');
     }
 
+    const completedSubPlots = plot.subPlots.filter((sp) => sp.status === SubPlotStatus.COMPLETED);
+
+    if (completedSubPlots.length === 0) {
+      throw new BadRequestException(
+        'O talhão não possui parcelas concluídas. Conclua ao menos uma parcela para processar o inventário.',
+      );
+    }
+
     const equationContext = await this.resolveEquationContext(dto);
 
-    const subPlotsInput: PipelineSubPlotInput[] = plot.subPlots.map((sp) => ({
+    const subPlotsInput: PipelineSubPlotInput[] = completedSubPlots.map((sp) => ({
       id: sp.id,
       name: sp.name,
       areaM2: sp.areaM2 ?? undefined,
@@ -155,6 +163,10 @@ export class ProcessingService {
         throw new NotFoundException(`Equação volumétrica ${dto.equationId} não encontrada.`);
       }
 
+      if (!eq.isActive) {
+        throw new BadRequestException(`A equação volumétrica ${dto.equationId} está inativa.`);
+      }
+
       return {
         id: eq.id,
         name: eq.name,
@@ -188,11 +200,11 @@ export class ProcessingService {
 
   private validateCustomEquationCoefficients(modelType: EquationType, beta2?: number | null) {
     if (modelType === EquationType.SCHUMACHER_HALL && beta2 == null) {
-      throw new BadRequestException('The Schumacher & Hall model requires beta2');
+      throw new BadRequestException('O modelo Schumacher e Hall requer beta2');
     }
 
     if (modelType !== EquationType.SCHUMACHER_HALL && beta2 != null) {
-      throw new BadRequestException('This model does not use beta2');
+      throw new BadRequestException('Esse modelo não usa beta2');
     }
   }
 
@@ -326,15 +338,16 @@ export class ProcessingService {
       const expansionFactor = 10000 / areaM2;
       const volumePerHa = totalVolumeM3 * expansionFactor;
       const basalAreaPerHa = totalBasalAreaM2 * expansionFactor;
-      const treesPerHa = treeCount * expansionFactor;
+      const treesPerHa = validTreeCount * expansionFactor;
 
-      const treesWithDap = processedTrees.filter((t) => t.diameterDapCm > 0);
+      const treesWithDap = processedTrees.filter((t) => t.isValid && t.diameterDapCm > 0);
       const meanDapCm =
         treesWithDap.length > 0
           ? treesWithDap.reduce((acc, t) => acc + t.diameterDapCm, 0) / treesWithDap.length
           : 0;
 
       const validHeights = processedTrees
+        .filter((t) => t.isValid)
         .map((t) => t.heightM)
         .filter((h): h is number => h != null && h > 0);
 
@@ -405,7 +418,8 @@ export class ProcessingService {
         ? subPlotsResults.reduce((acc, sp) => acc + sp.treesPerHa, 0) / totalSubPlots
         : 0;
 
-    const allTreesWithDap = allProcessedTrees.filter((t) => t.diameterDapCm > 0);
+    const allValidTrees = allProcessedTrees.filter((t) => t.isValid);
+    const allTreesWithDap = allValidTrees.filter((t) => t.diameterDapCm > 0);
     const meanDapCm =
       allTreesWithDap.length > 0
         ? allTreesWithDap.reduce((acc, t) => acc + t.diameterDapCm, 0) / allTreesWithDap.length
@@ -415,7 +429,7 @@ export class ProcessingService {
       allTreesWithDap.map((t) => t.diameterDapCm),
     );
 
-    const allValidHeights = allProcessedTrees
+    const allValidHeights = allValidTrees
       .map((t) => t.heightM)
       .filter((h): h is number => h != null && h > 0);
 
@@ -441,14 +455,14 @@ export class ProcessingService {
 
     // Distribuições
     const qualityDistribution = this.statisticsService.calculateQualityClasses(
-      allProcessedTrees.map((t) => ({
+      allValidTrees.map((t) => ({
         quality: String(t.quality),
         volumeM3: t.volumeM3,
       })),
     );
 
     const diameterClasses = this.statisticsService.calculateDiameterClasses(
-      allProcessedTrees.map((t) => ({
+      allValidTrees.map((t) => ({
         diameterDapCm: t.diameterDapCm,
         volumeM3: t.volumeM3,
       })),

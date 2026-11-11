@@ -18,11 +18,11 @@ export class EquationsService {
   // Valida os coeficientes de acordo com o modelo da equação
   private validateCoefficients(modelType: EquationType, beta2?: number | null) {
     if (modelType === EquationType.SCHUMACHER_HALL && beta2 == null) {
-      throw new BadRequestException('The Schumacher & Hall model requires beta2');
+      throw new BadRequestException('O modelo Schumacher e Hall requer beta2');
     }
 
     if (modelType !== EquationType.SCHUMACHER_HALL && beta2 != null) {
-      throw new BadRequestException('This model does not use beta2');
+      throw new BadRequestException('Esse modelo não usa beta2');
     }
   }
 
@@ -55,7 +55,7 @@ export class EquationsService {
     });
 
     if (!equation) {
-      throw new NotFoundException('Equation not found');
+      throw new NotFoundException('Equação não encontrada');
     }
 
     return equation;
@@ -91,7 +91,7 @@ export class EquationsService {
     const equation = await this.findOne(id);
 
     if (equation.isActive === isActive) {
-      throw new ConflictException(`Equation is already ${isActive ? 'active' : 'inactive'}`);
+      throw new ConflictException(`A equação já está ${isActive ? 'ativa' : 'inativa'}`);
     }
 
     return this.prisma.volumetricEquation.update({
@@ -119,20 +119,20 @@ export class EquationsService {
     heightM?: number,
   ): number {
     if (dapCm <= 0) {
-      throw new BadRequestException('DAP must be greater than zero');
+      throw new BadRequestException('O DAP deve ser maior que zero');
     }
 
     switch (modelType) {
       case EquationType.SCHUMACHER_HALL:
         if (beta2 == null || heightM == null || heightM <= 0) {
-          throw new BadRequestException('Schumacher & Hall requires beta2 and a valid tree height');
+          throw new BadRequestException('Schumacher e Hall requer beta2 e uma altura válida da árvore');
         }
 
         return Math.exp(beta0 + beta1 * Math.log(dapCm) + beta2 * Math.log(heightM));
 
       case EquationType.SPURR:
         if (heightM == null || heightM <= 0) {
-          throw new BadRequestException('Spurr requires a valid tree height');
+          throw new BadRequestException('Spurr requer uma altura válida da árvore');
         }
 
         return beta0 + beta1 * (dapCm ** 2 * heightM);
@@ -141,7 +141,7 @@ export class EquationsService {
         return Math.exp(beta0 + beta1 * Math.log(dapCm));
 
       default:
-        throw new BadRequestException('Unsupported equation model');
+        throw new BadRequestException('Modelo de equação não suportado');
     }
   }
 }
