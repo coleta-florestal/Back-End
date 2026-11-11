@@ -1,3 +1,9 @@
+# [1.0.0-rc.4](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.3...v1.0.0-rc.4) (2026-11-11)
+
+### Bug Fixes
+
+- **migration:** map old TreeQuality values before enum cast ([86258ea](https://github.com/coleta-florestal/Back-End/commit/86258ea04227d76a5db3bc513ef0f16f77a1d5e8))
+
 # [1.0.0-rc.3](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2026-11-11)
 
 ### Bug Fixes
