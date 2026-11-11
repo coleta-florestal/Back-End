@@ -10,7 +10,7 @@ export class ValidationsService {
     const settings = await this.prisma.validationSettings.findUnique({ where: { id: 1 } });
 
     if (!settings) {
-      throw new NotFoundException('Validation settings have not been configured');
+      throw new NotFoundException('Os limites de validação ainda não foram configurados');
     }
 
     return settings;
@@ -18,11 +18,11 @@ export class ValidationsService {
 
   async update(dto: UpdateValidationSettingsDto) {
     if (dto.minDapCm >= dto.maxDapCm) {
-      throw new BadRequestException('Minimum DAP must be less than maximum DAP');
+      throw new BadRequestException('O DAP mínimo deve ser menor que o DAP máximo');
     }
 
     if (dto.minHeightM >= dto.maxHeightM) {
-      throw new BadRequestException('Minimum height must be less than maximum height');
+      throw new BadRequestException('A altura mínima deve ser menor que a altura máxima');
     }
 
     return this.prisma.validationSettings.upsert({
