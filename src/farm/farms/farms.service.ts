@@ -55,17 +55,16 @@ export class FarmsService {
   }
 
   async create(dto: CreateFarmDto) {
-
     const user = await this.prisma.user.findUnique({
       where: {
-        id: dto.ownerId
-      }
-    })
+        id: dto.ownerId,
+      },
+    });
 
     if (!user) {
-      throw new NotFoundException("Usuário não encontrado")
+      throw new NotFoundException('Usuário não encontrado');
     }
-    
+
     const farm = await this.prisma.farm.create({
       data: {
         name: dto.name,
