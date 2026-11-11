@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { EquationsService } from 'src/admin/equations/equations.service';
+import { EquationsModule } from 'src/admin/equations/equations.module';
 import { ProcessingController } from './processing.controller';
 import { ProcessingService } from './processing.service';
 import { StatisticsService } from './statistics.service';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, EquationsModule],
   controllers: [ProcessingController],
-  providers: [ProcessingService, StatisticsService, EquationsService],
+  providers: [ProcessingService, StatisticsService],
   exports: [ProcessingService, StatisticsService],
 })
 export class ProcessingModule {}

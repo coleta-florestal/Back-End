@@ -16,7 +16,7 @@ export class EquationsService {
   constructor(private readonly prisma: PrismaService) {}
 
   // Valida os coeficientes de acordo com o modelo da equação
-  private validateCoefficients(modelType: EquationType, beta2?: number | null) {
+  validateCoefficients(modelType: EquationType, beta2?: number | null) {
     if (modelType === EquationType.SCHUMACHER_HALL && beta2 == null) {
       throw new BadRequestException('O modelo Schumacher e Hall requer beta2');
     }
@@ -125,7 +125,9 @@ export class EquationsService {
     switch (modelType) {
       case EquationType.SCHUMACHER_HALL:
         if (beta2 == null || heightM == null || heightM <= 0) {
-          throw new BadRequestException('Schumacher e Hall requer beta2 e uma altura válida da árvore');
+          throw new BadRequestException(
+            'Schumacher e Hall requer beta2 e uma altura válida da árvore',
+          );
         }
 
         return Math.exp(beta0 + beta1 * Math.log(dapCm) + beta2 * Math.log(heightM));

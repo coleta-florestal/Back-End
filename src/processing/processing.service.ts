@@ -53,7 +53,7 @@ export class ProcessingService {
     const plot = await this.prisma.plot.findUnique({
       where: { id: plotId },
       include: {
-        farm: true,
+        farm: { select: { name: true } },
         subPlots: {
           include: {
             trees: true,
@@ -121,6 +121,12 @@ export class ProcessingService {
       throw new BadRequestException('Nenhuma parcela informada no payload para processamento.');
     }
 
+    if (dto.finitePopulation && !(dto.plotAreaHa && dto.plotAreaHa > 0)) {
+      throw new BadRequestException(
+        'A correção para população finita exige plotAreaHa maior que zero.',
+      );
+    }
+
     const equationContext = await this.resolveEquationContext(dto);
 
     return this.executePipeline(
@@ -144,7 +150,7 @@ export class ProcessingService {
     dto: ProcessInventoryDto,
   ): Promise<ProcessingEquationContext> {
     if (dto.equation) {
-      this.validateCustomEquationCoefficients(dto.equation.modelType, dto.equation.beta2);
+      this.equationsService.validateCoefficients(dto.equation.modelType, dto.equation.beta2);
       return {
         name: dto.equation.name || `Equação Customizada (${dto.equation.modelType})`,
         modelType: dto.equation.modelType,
@@ -196,16 +202,6 @@ export class ProcessingService {
       beta1: activeEquation.beta1,
       beta2: activeEquation.beta2,
     };
-  }
-
-  private validateCustomEquationCoefficients(modelType: EquationType, beta2?: number | null) {
-    if (modelType === EquationType.SCHUMACHER_HALL && beta2 == null) {
-      throw new BadRequestException('O modelo Schumacher e Hall requer beta2');
-    }
-
-    if (modelType !== EquationType.SCHUMACHER_HALL && beta2 != null) {
-      throw new BadRequestException('Esse modelo não usa beta2');
-    }
   }
 
   /**
