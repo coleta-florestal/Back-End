@@ -6,6 +6,7 @@ import { FarmModule } from './farm/farm.module';
 import { ProfileModule } from './profile/profile.module';
 import { AdminModule } from './admin/admin.module';
 import { ProcessingModule } from './processing/processing.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ProcessingModule } from './processing/processing.module';
     ProfileModule,
     AdminModule,
     ProcessingModule,
+    DashboardModule,
   ],
   controllers: [],
   providers: [],
