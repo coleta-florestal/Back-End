@@ -1,14 +1,18 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Role, SubPlotStatus } from 'src/generated/prisma/enums';
+import { ProcessingService } from 'src/processing/processing.service';
+
+import { SubPlotStatus } from 'src/generated/prisma/enums';
 
 @Injectable()
 export class DashboardService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly processingService: ProcessingService,
+  ) {}
 
-  async getFarmDashboard(farmId: string, user: { id: string; role: Role }) {
-    // Verifica se a fazenda existe
+  async getFarmDashboard(farmId: string) {
     const farm = await this.prisma.farm.findUnique({
       where: { id: farmId },
       select: {
@@ -26,7 +30,9 @@ export class DashboardService {
                 id: true,
                 status: true,
                 _count: {
-                  select: { trees: true },
+                  select: {
+                    trees: true,
+                  },
                 },
               },
             },
@@ -39,20 +45,22 @@ export class DashboardService {
       throw new NotFoundException('Fazenda não encontrada');
     }
 
-    // Verifica a permissão de acesso
-    if (user.role === Role.USER && farm.ownerId !== user.id) {
-      throw new ForbiddenException('Você não tem permissão para acessar esta fazenda');
-    }
+    // if (user.role === Role.USER && farm.ownerId !== user.id) {
+    //   throw new ForbiddenException('Você não tem permissão para acessar esta fazenda');
+    // }
 
-    // Busca os indicadores das árvores
     const [treeStats, qualityDistribution] = await Promise.all([
       this.prisma.tree.aggregate({
         where: {
           subPlot: {
-            plot: { farmId },
+            plot: {
+              farmId,
+            },
           },
         },
-        _count: { _all: true },
+        _count: {
+          _all: true,
+        },
         _avg: {
           diameterDapCm: true,
           height: true,
@@ -63,37 +71,73 @@ export class DashboardService {
         by: ['quality'],
         where: {
           subPlot: {
-            plot: { farmId },
+            plot: {
+              farmId,
+            },
           },
         },
-        _count: { _all: true },
+        _count: {
+          _all: true,
+        },
       }),
     ]);
 
-    // Organiza os dados dos talhões
-    const plots = farm.plots.map((plot) => {
-      const totalSubPlots = plot.subPlots.length;
+    const plots = await Promise.all(
+      farm.plots.map(async (plot) => {
+        const totalSubPlots = plot.subPlots.length;
 
-      const completedSubPlots = plot.subPlots.filter(
-        (subPlot) => subPlot.status === SubPlotStatus.COMPLETED,
-      ).length;
+        const completedSubPlots = plot.subPlots.filter(
+          (subPlot) => subPlot.status === SubPlotStatus.COMPLETED,
+        ).length;
 
-      const totalTrees = plot.subPlots.reduce((total, subPlot) => total + subPlot._count.trees, 0);
+        const totalTrees = plot.subPlots.reduce(
+          (total, subPlot) => total + subPlot._count.trees,
+          0,
+        );
 
-      const progress = totalSubPlots > 0 ? (completedSubPlots / totalSubPlots) * 100 : 0;
+        const progress = totalSubPlots > 0 ? (completedSubPlots / totalSubPlots) * 100 : 0;
 
-      return {
-        id: plot.id,
-        name: plot.name,
-        status: plot.status,
-        totalTrees,
-        totalSubPlots,
-        completedSubPlots,
-        progress: Number(progress.toFixed(2)),
-      };
-    });
+        let processing: Awaited<ReturnType<ProcessingService['processPlot']>> | null = null;
 
-    // Retorna os dados do dashboard
+        let processingError: string | null = null;
+
+        try {
+          processing = await this.processingService.processPlot(plot.id, {}, farmId);
+        } catch (error) {
+          if (error instanceof BadRequestException) {
+            processingError = error.message;
+          } else {
+            throw error;
+          }
+        }
+
+        return {
+          id: plot.id,
+          name: plot.name,
+          status: plot.status,
+          totalTrees,
+          totalSubPlots,
+          completedSubPlots,
+          progress: Number(progress.toFixed(2)),
+          processing,
+          processingError,
+        };
+      }),
+    );
+
+    const processedPlots = plots.filter((plot) => plot.processing !== null);
+
+    const plotsWithEstimatedVolume = processedPlots.filter(
+      (plot) =>
+        plot.processing?.totals.estimatedTotalVolumeM3 !== null &&
+        plot.processing?.totals.estimatedTotalVolumeM3 !== undefined,
+    );
+
+    const totalEstimatedVolumeM3 = plotsWithEstimatedVolume.reduce(
+      (total, plot) => total + (plot.processing?.totals.estimatedTotalVolumeM3 ?? 0),
+      0,
+    );
+
     return {
       farm: {
         id: farm.id,
@@ -106,6 +150,9 @@ export class DashboardService {
         totalTrees: treeStats._count._all,
         averageDap: treeStats._avg.diameterDapCm,
         averageHeight: treeStats._avg.height,
+        processedPlots: processedPlots.length,
+        plotsWithEstimatedVolume: plotsWithEstimatedVolume.length,
+        totalEstimatedVolumeM3,
       },
 
       plots,
