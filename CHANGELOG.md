@@ -1,3 +1,26 @@
+# [1.0.0-rc.3](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2026-11-11)
+
+### Bug Fixes
+
+- **all:** lint ([fb93ee0](https://github.com/coleta-florestal/Back-End/commit/fb93ee014bd1bfd2b6076571d4fc73f34c4473f4))
+- **dashboard:** ajusta métodos do service de dashboard ([c292260](https://github.com/coleta-florestal/Back-End/commit/c292260d2a3dae1c259f96e04c653334770fc5b5))
+- **dashboard:** fix dashboard controller imports ([259c31e](https://github.com/coleta-florestal/Back-End/commit/259c31e24451bc78277c2856c6d32c8cceed5b69))
+- **dashboards:** fix service dashboard methods ([5f0ea65](https://github.com/coleta-florestal/Back-End/commit/5f0ea65064583199cab7032eb81572ad08d31bc3))
+- **processing:** restringe acesso, valida entradas e usa apenas dados validos ([336bfe7](https://github.com/coleta-florestal/Back-End/commit/336bfe726c7dbf3056457c19d4fadb2258228108))
+
+### Features
+
+- **dashboard:** add dashboard controller methods ([68cb9a5](https://github.com/coleta-florestal/Back-End/commit/68cb9a596f77d7b15bb4822a918e8c3321d6952e))
+- **dashboard:** add dashboard service method ([087b6e5](https://github.com/coleta-florestal/Back-End/commit/087b6e5019653babc21c66ef643570facd517928))
+- **farm:** add user validation when creating farm ([3333720](https://github.com/coleta-florestal/Back-End/commit/33337207c5e19f5137f909bebdadc3c8b38f9437))
+- **processing:** adiciona tipos e DTOs para pipeline de processamento ([07d1b73](https://github.com/coleta-florestal/Back-End/commit/07d1b73d19cd2a5394dba0b522c137043bd41d18))
+- **processing:** implementa ProcessingController e registra ProcessingModule ([ffaf90e](https://github.com/coleta-florestal/Back-End/commit/ffaf90ec99edfd82ad03588df902e3418da72e5e))
+- **processing:** implementa ProcessingService para orquestracao do fluxo de inventario ([259d706](https://github.com/coleta-florestal/Back-End/commit/259d706490471fd45fd2037a1f1fa81317d7be21))
+- **processing:** implementa StatisticsService para calculos descritivos e amostragem ([f8cb170](https://github.com/coleta-florestal/Back-End/commit/f8cb1700e636084ab569cf88835d7392dff7e4f7))
+- **validations:** adiciona modelo de limites ([49e3e91](https://github.com/coleta-florestal/Back-End/commit/49e3e910e73eacdd5e17c642d41ad8a78b82f50c))
+- **validations:** adiciona rotas administrativas ([86805c2](https://github.com/coleta-florestal/Back-End/commit/86805c269f2310045a9f89c1b594a9dfee08dbcb))
+- **validations:** implementa regras dos limites ([9387442](https://github.com/coleta-florestal/Back-End/commit/938744234a5d7e2fdd8f8d56caf65fa7605b63be))
+
 # [1.0.0-rc.2](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2026-11-05)
 
 ### Features
