@@ -26,8 +26,8 @@ export class FarmsController {
   constructor(private readonly farmService: FarmsService) {}
 
   @Get('')
-  findAll(@Query('search') search?: string) {
-    return this.farmService.findAll(search);
+  findAll(@GetUser() user: User, @Query('search') search?: string) {
+    return this.farmService.findAll(user, search);
   }
 
   @Get('admin_owners')
