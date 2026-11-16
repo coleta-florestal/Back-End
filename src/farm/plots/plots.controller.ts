@@ -11,12 +11,14 @@ import {
 } from '@nestjs/common';
 
 import { PlotsService } from './plots.service';
-
 import { CreatePlotDto } from './dto/CreatePlot.dto';
+import { UpdatePlotDto } from './dto/UpdatePlot.dto';
 
 import { Roles } from 'src/auth/decorator/roles.decorator';
+import { GetUser } from 'src/auth/decorator/currentUser.decorator';
+
 import { Role } from 'src/generated/prisma/enums';
-import { UpdatePlotDto } from './dto/UpdatePlot.dto';
+import type { User } from 'src/generated/prisma/client';
 
 @Controller('farms/:farmId/plots')
 export class PlotsController {
@@ -29,26 +31,32 @@ export class PlotsController {
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @Post()
-  create(@Param('farmId', ParseUUIDPipe) farmId: string, @Body() dto: CreatePlotDto) {
-    return this.plotsService.create(farmId, dto);
+  create(
+    @GetUser() user: User,
+    @Param('farmId', ParseUUIDPipe) farmId: string,
+    @Body() dto: CreatePlotDto,
+  ) {
+    return this.plotsService.create(user, farmId, dto);
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @Patch(':plotId')
   update(
+    @GetUser() user: User,
     @Param('farmId', ParseUUIDPipe) farmId: string,
     @Param('plotId', ParseUUIDPipe) plotId: string,
     @Body() dto: UpdatePlotDto,
   ) {
-    return this.plotsService.update(farmId, plotId, dto);
+    return this.plotsService.update(user, farmId, plotId, dto);
   }
 
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @Delete(':plotId')
   remove(
+    @GetUser() user: User,
     @Param('farmId', ParseUUIDPipe) farmId: string,
     @Param('plotId', ParseUUIDPipe) plotId: string,
   ) {
-    return this.plotsService.remove(farmId, plotId);
+    return this.plotsService.remove(user, farmId, plotId);
   }
 }
