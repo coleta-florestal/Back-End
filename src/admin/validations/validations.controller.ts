@@ -1,6 +1,10 @@
 import { Body, Controller, Get, Put } from '@nestjs/common';
 import { Roles } from 'src/auth/decorator/roles.decorator';
+import { GetUser } from 'src/auth/decorator/currentUser.decorator';
+
 import { Role } from 'src/generated/prisma/enums';
+import type { User } from 'src/generated/prisma/client';
+
 import { UpdateValidationSettingsDto } from './dto/update-validation-settings.dto';
 import { ValidationsService } from './validations.service';
 
@@ -15,7 +19,7 @@ export class ValidationsController {
   }
 
   @Put()
-  update(@Body() dto: UpdateValidationSettingsDto) {
-    return this.validationsService.update(dto);
+  update(@Body() dto: UpdateValidationSettingsDto, @GetUser() user: User) {
+    return this.validationsService.update(user, dto);
   }
 }

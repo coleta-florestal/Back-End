@@ -47,6 +47,7 @@ enum AuditEntity {
   SUBPLOT
   TREE
   EQUATION
+  VALIDATION_SETTINGS
 }
 
 model User {
