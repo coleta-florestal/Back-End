@@ -28,6 +28,11 @@ export class ProcessingController {
     return this.processingService.processPlot(plotId, dto, farmId);
   }
 
+  @Post('farms/:farmId')
+  processFarm(@Param('farmId', ParseUUIDPipe) farmId: string, @Body() dto: ProcessInventoryDto) {
+    return this.processingService.processFarm(farmId, dto);
+  }
+
   @Post('payload')
   processPayload(@Body() dto: ProcessPayloadDto): Promise<InventoryProcessingResult> {
     return this.processingService.processPayload(dto);
