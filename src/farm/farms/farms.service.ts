@@ -5,9 +5,16 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateFarmDto } from './dto/CreateFarm.dto';
 import { UpdateFarmDto } from './dto/UpdateFarm.dto';
 
+import type { User } from 'src/generated/prisma/client';
+import { AuditAction, AuditEntity } from 'src/generated/prisma/enums';
+import { AuditService } from '../../admin/audit/audit.service';
+
 @Injectable()
 export class FarmsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditService: AuditService,
+  ) {}
 
   async findAll(search?: string) {
     const whereClause = search ? { contains: search, mode: 'insensitive' as const } : {};
@@ -54,7 +61,7 @@ export class FarmsService {
     });
   }
 
-  async create(dto: CreateFarmDto) {
+  async create(actor: User, dto: CreateFarmDto) {
     const user = await this.prisma.user.findUnique({
       where: {
         id: dto.ownerId,
@@ -74,11 +81,16 @@ export class FarmsService {
       },
     });
 
+    await this.auditService.create(AuditAction.CREATE, AuditEntity.FARM, actor.id, {
+      targetFarmId: farm.id,
+      farmName: farm.name,
+    });
+
     return farm;
   }
 
-  async update(farmId: string, dto: UpdateFarmDto) {
-    await this.findFarm(farmId);
+  async update(actor: User, farmId: string, dto: UpdateFarmDto) {
+    const previousFarm = await this.findFarm(farmId);
 
     const farm = await this.prisma.farm.update({
       where: {
@@ -92,16 +104,29 @@ export class FarmsService {
       },
     });
 
+    await this.auditService.create(AuditAction.UPDATE, AuditEntity.FARM, actor.id, {
+      targetFarmId: farm.id,
+      previousName: previousFarm.name,
+      newName: farm.name,
+    });
+
     return farm;
   }
 
-  async remove(farmId: string) {
-    await this.findFarm(farmId);
+  async remove(actor: User, farmId: string) {
+    const farm = await this.findFarm(farmId);
 
     await this.prisma.farm.delete({
       where: {
         id: farmId,
       },
     });
+
+    await this.auditService.create(AuditAction.DELETE, AuditEntity.FARM, actor.id, {
+      targetFarmId: farm.id,
+      farmName: farm.name,
+    });
+
+    return { message: 'Fazenda removida com sucesso' };
   }
 }
