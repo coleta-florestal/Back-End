@@ -48,25 +48,25 @@ export class UsersController {
 
   // Recusa uma solicitação
   @Patch(':id/reject')
-  reject(@Param('id') id: string) {
-    return this.usersService.reject(id);
+  reject(@GetUser() user: User, @Param('id') id: string) {
+    return this.usersService.reject(user, id);
   }
 
   // Ativa uma conta
   @Patch(':id/activate')
-  activate(@Param('id') id: string) {
-    return this.usersService.activate(id);
+  activate(@GetUser() user: User, @Param('id') id: string) {
+    return this.usersService.activate(user, id);
   }
 
   // Desativa uma conta
   @Patch(':id/deactivate')
-  deactivate(@Param('id') id: string) {
-    return this.usersService.deactivate(id);
+  deactivate(@GetUser() user: User, @Param('id') id: string) {
+    return this.usersService.deactivate(user, id);
   }
 
   // Remove permanentemente um usuário
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+  remove(@GetUser() user: User, @Param('id') id: string) {
+    return this.usersService.remove(user, id);
   }
 }
