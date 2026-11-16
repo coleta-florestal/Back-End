@@ -59,6 +59,7 @@ model User {
 
   farms Farm[]
   auditLogs AuditLog[]
+  farmAccesses UserFarm[] @relation("UserFarmAccess")
 
   accountStatus AccountStatus @default(ACTIVE) @map("account_status")
   status UserStatus @default(PENDING)
@@ -78,6 +79,7 @@ model Farm {
   
   ownerId String @map("owner_id") 
   owner User @relation(fields: [ownerId], references: [id])
+  userAccesses UserFarm[] @relation("UserFarmAccess")
 
   plots Plot[]
 
@@ -221,3 +223,16 @@ model AuditLog {
   @@map("audit_logs")
 }
 
+model UserFarm {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  farmId    String   @map("farm_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation("UserFarmAccess", fields: [userId], references: [id], onDelete: Cascade)
+  farm Farm @relation("UserFarmAccess", fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, farmId])
+  @@index([farmId])
+  @@map("user_farms")
+}
