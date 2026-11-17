@@ -11,9 +11,17 @@ import { EquationType } from 'src/generated/prisma/enums';
 import { CreateEquationDto } from './dto/create-equation.dto';
 import { UpdateEquationDto } from './dto/update-equation.dto';
 
+import type { User } from 'src/generated/prisma/client';
+import { AuditAction, AuditEntity } from 'src/generated/prisma/enums';
+
+import { AuditService } from 'src/admin/audit/audit.service';
+
 @Injectable()
 export class EquationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditService: AuditService,
+  ) {}
 
   // Valida os coeficientes de acordo com o modelo da equação
   validateCoefficients(modelType: EquationType, beta2?: number | null) {
@@ -27,10 +35,10 @@ export class EquationsService {
   }
 
   // Cadastra uma nova equação volumétrica
-  async create(dto: CreateEquationDto) {
+  async create(actor: User, dto: CreateEquationDto) {
     this.validateCoefficients(dto.modelType, dto.beta2);
 
-    return this.prisma.volumetricEquation.create({
+    const equation = await this.prisma.volumetricEquation.create({
       data: {
         name: dto.name,
         modelType: dto.modelType,
@@ -39,6 +47,17 @@ export class EquationsService {
         beta2: dto.modelType === EquationType.SCHUMACHER_HALL ? dto.beta2! : null,
       },
     });
+
+    await this.auditService.create(AuditAction.CREATE, AuditEntity.EQUATION, actor.id, {
+      equationId: equation.id,
+      name: equation.name,
+      modelType: equation.modelType,
+      beta0: equation.beta0,
+      beta1: equation.beta1,
+      beta2: equation.beta2,
+    });
+
+    return equation;
   }
 
   // Retorna todas as equações cadastradas
@@ -62,7 +81,7 @@ export class EquationsService {
   }
 
   // Atualiza os dados de uma equação
-  async update(id: string, dto: UpdateEquationDto) {
+  async update(actor: User, id: string, dto: UpdateEquationDto) {
     const equation = await this.findOne(id);
 
     const modelType = dto.modelType ?? equation.modelType;
@@ -74,7 +93,7 @@ export class EquationsService {
       modelType === EquationType.SCHUMACHER_HALL ? beta2 : dto.beta2,
     );
 
-    return this.prisma.volumetricEquation.update({
+    const updatedEquation = await this.prisma.volumetricEquation.update({
       where: { id },
       data: {
         name: dto.name ?? equation.name,
@@ -84,29 +103,69 @@ export class EquationsService {
         beta2: modelType === EquationType.SCHUMACHER_HALL ? beta2 : null,
       },
     });
+
+    await this.auditService.create(AuditAction.UPDATE, AuditEntity.EQUATION, actor.id, {
+      equationId: id,
+      previous: {
+        name: equation.name,
+        modelType: equation.modelType,
+        beta0: equation.beta0,
+        beta1: equation.beta1,
+        beta2: equation.beta2,
+      },
+      current: {
+        name: updatedEquation.name,
+        modelType: updatedEquation.modelType,
+        beta0: updatedEquation.beta0,
+        beta1: updatedEquation.beta1,
+        beta2: updatedEquation.beta2,
+      },
+    });
+
+    return updatedEquation;
   }
 
   // Ativa ou desativa uma equação
-  async updateStatus(id: string, isActive: boolean) {
+  async updateStatus(actor: User, id: string, isActive: boolean) {
     const equation = await this.findOne(id);
 
     if (equation.isActive === isActive) {
       throw new ConflictException(`A equação já está ${isActive ? 'ativa' : 'inativa'}`);
     }
 
-    return this.prisma.volumetricEquation.update({
+    const updatedEquation = await this.prisma.volumetricEquation.update({
       where: { id },
       data: { isActive },
     });
+
+    await this.auditService.create(AuditAction.UPDATE, AuditEntity.EQUATION, actor.id, {
+      equationId: id,
+      name: equation.name,
+      previousStatus: equation.isActive,
+      newStatus: updatedEquation.isActive,
+    });
+
+    return updatedEquation;
   }
 
   // Exclui uma equação
-  async remove(id: string) {
-    await this.findOne(id);
+  async remove(actor: User, id: string) {
+    const equation = await this.findOne(id);
 
-    return this.prisma.volumetricEquation.delete({
+    const deletedEquation = await this.prisma.volumetricEquation.delete({
       where: { id },
     });
+
+    await this.auditService.create(AuditAction.DELETE, AuditEntity.EQUATION, actor.id, {
+      equationId: id,
+      name: equation.name,
+      modelType: equation.modelType,
+      beta0: equation.beta0,
+      beta1: equation.beta1,
+      beta2: equation.beta2,
+    });
+
+    return deletedEquation;
   }
 
   // Calcula o volume da árvore utilizando a equação selecionada

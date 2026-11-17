@@ -2,6 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FarmsService } from '../farms/farms.service';
+import { AuditService } from '../../admin/audit/audit.service';
+
+import type { User } from 'src/generated/prisma/client';
+import { AuditAction, AuditEntity } from 'src/generated/prisma/enums';
 
 import { CreatePlotDto } from './dto/CreatePlot.dto';
 import { UpdatePlotDto } from './dto/UpdatePlot.dto';
@@ -11,6 +15,7 @@ export class PlotsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly farmService: FarmsService,
+    private readonly auditService: AuditService,
   ) {}
 
   async findAll(farmId: string, search?: string) {
@@ -58,8 +63,8 @@ export class PlotsService {
     return plot;
   }
 
-  async create(farmId: string, dto: CreatePlotDto) {
-    await this.farmService.findFarm(farmId);
+  async create(actor: User, farmId: string, dto: CreatePlotDto) {
+    const farm = await this.farmService.findFarm(farmId);
 
     const plot = await this.prisma.plot.create({
       data: {
@@ -70,11 +75,18 @@ export class PlotsService {
       },
     });
 
+    await this.auditService.create(AuditAction.CREATE, AuditEntity.PLOT, actor.id, {
+      targetPlotId: plot.id,
+      plotName: plot.name,
+      farmId: farm.id,
+      farmName: farm.name,
+    });
+
     return plot;
   }
 
-  async update(farmId: string, plotId: string, dto: UpdatePlotDto) {
-    await this.findPlot(farmId, plotId);
+  async update(actor: User, farmId: string, plotId: string, dto: UpdatePlotDto) {
+    const previousPlot = await this.findPlot(farmId, plotId);
 
     const plot = await this.prisma.plot.update({
       where: {
@@ -88,11 +100,18 @@ export class PlotsService {
       },
     });
 
+    await this.auditService.create(AuditAction.UPDATE, AuditEntity.PLOT, actor.id, {
+      targetPlotId: plot.id,
+      farmId: farmId,
+      previousName: previousPlot.name,
+      newName: plot.name,
+    });
+
     return plot;
   }
 
-  async remove(farmId: string, plotId: string) {
-    await this.findPlot(farmId, plotId);
+  async remove(actor: User, farmId: string, plotId: string) {
+    const plot = await this.findPlot(farmId, plotId);
 
     await this.prisma.plot.delete({
       where: {
@@ -100,5 +119,13 @@ export class PlotsService {
         farmId: farmId,
       },
     });
+
+    await this.auditService.create(AuditAction.DELETE, AuditEntity.PLOT, actor.id, {
+      targetPlotId: plot.id,
+      plotName: plot.name,
+      farmId: farmId,
+    });
+
+    return { message: 'Talhão removido com sucesso' };
   }
 }

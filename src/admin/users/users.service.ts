@@ -6,16 +6,27 @@ import {
 } from '@nestjs/common';
 
 import type { User } from 'src/generated/prisma/client';
-import { AccountStatus, Role, UserStatus } from 'src/generated/prisma/enums';
+import {
+  AccountStatus,
+  Role,
+  UserStatus,
+  AuditAction,
+  AuditEntity,
+} from 'src/generated/prisma/enums';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 
 import { ApproveUserDto } from './dto/approve-user.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
 
+import { AuditService } from '../audit/audit.service';
+
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditService: AuditService,
+  ) {}
 
   async findAll() {
     return this.prisma.user.findMany({
@@ -75,11 +86,19 @@ export class UsersService {
       throw new ForbiddenException('ADMIN can only assign USER role');
     }
 
-    return await this.prisma.user.update({
+    const updatedUser = await this.prisma.user.update({
       where: { id },
       data: { role: dto.role },
       omit: { password: true },
     });
+
+    await this.auditService.create(AuditAction.UPDATE, AuditEntity.USER, actor.id, {
+      targetUserId: id,
+      previousRole: user.role,
+      newRole: dto.role,
+    });
+
+    return updatedUser;
   }
 
   // Aprova uma solicitação de acesso
@@ -106,11 +125,18 @@ export class UsersService {
       throw new ConflictException('User does not have a pending request');
     }
 
-    return this.findById(id);
+    const approvedUser = await this.findById(id);
+
+    await this.auditService.create(AuditAction.APPROVE, AuditEntity.USER, actor.id, {
+      targetUserId: id,
+      role: dto.role,
+    });
+
+    return approvedUser;
   }
 
   // Recusa uma solicitação de acesso
-  async reject(id: string) {
+  async reject(actor: User, id: string) {
     const result = await this.prisma.user.updateMany({
       where: {
         id,
@@ -127,21 +153,24 @@ export class UsersService {
       throw new ConflictException('User does not have a pending request');
     }
 
+    await this.auditService.create(AuditAction.REJECT, AuditEntity.USER, actor.id, {
+      targetUserId: id,
+    });
+
     return { message: 'User request rejected successfully' };
   }
-
   // Ativa uma conta
-  async activate(id: string) {
-    return this.changeAccountStatus(id, AccountStatus.ACTIVE);
+  async activate(actor: User, id: string) {
+    return this.changeAccountStatus(actor, id, AccountStatus.ACTIVE);
   }
 
   // Desativa uma conta
-  async deactivate(id: string) {
-    return this.changeAccountStatus(id, AccountStatus.INACTIVE);
+  async deactivate(actor: User, id: string) {
+    return this.changeAccountStatus(actor, id, AccountStatus.INACTIVE);
   }
 
   // Método interno para alterar o status da conta
-  private async changeAccountStatus(id: string, accountStatus: AccountStatus) {
+  private async changeAccountStatus(actor: User, id: string, accountStatus: AccountStatus) {
     const user = await this.findById(id);
 
     if (user.status !== UserStatus.APPROVED) {
@@ -156,15 +185,23 @@ export class UsersService {
       throw new ConflictException(`User account is already ${accountStatus.toLowerCase()}`);
     }
 
-    return this.prisma.user.update({
+    const updatedUser = await this.prisma.user.update({
       where: { id },
       data: { accountStatus },
       omit: { password: true },
     });
+
+    await this.auditService.create(AuditAction.UPDATE, AuditEntity.USER, actor.id, {
+      targetUserId: id,
+      previousStatus: user.accountStatus,
+      newStatus: accountStatus,
+    });
+
+    return updatedUser;
   }
 
   // Remove permanentemente um usuário
-  async remove(id: string) {
+  async remove(actor: User, id: string) {
     const target = await this.findById(id);
 
     if (target.role === Role.SUPER_ADMIN) {
@@ -178,6 +215,15 @@ export class UsersService {
     await this.prisma.user.delete({
       where: { id },
     });
+
+    await this.auditService.create(AuditAction.DELETE, AuditEntity.USER, actor.id, {
+      targetUserId: id,
+      name: target.name,
+      email: target.email,
+      role: target.role,
+    });
+
+    return { message: 'User removed successfully' };
   }
 
   // Busca usuário por ID (uso interno)

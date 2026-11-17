@@ -6,11 +6,16 @@ import { SubPlotsService } from '../subplots/subplots.service';
 import { UpdateTreeDto } from './dto/UpdateTree.dto';
 import { CreateTreeDto } from './dto/CreateTree.dto';
 
+import { AuditService } from '../../admin/audit/audit.service';
+import { AuditAction, AuditEntity } from 'src/generated/prisma/enums';
+import type { User } from 'src/generated/prisma/client';
+
 @Injectable()
 export class TreesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly subPlotService: SubPlotsService,
+    private readonly auditService: AuditService,
   ) {}
 
   async findAll(farmId: string, plotId: string, subPlotId: string, search?: string) {
@@ -46,10 +51,10 @@ export class TreesService {
     return tree;
   }
 
-  async create(farmId: string, plotId: string, subPlotId: string, dto: CreateTreeDto) {
-    await this.subPlotService.findSubPlot(farmId, plotId, subPlotId);
+  async create(actor: User, farmId: string, plotId: string, subPlotId: string, dto: CreateTreeDto) {
+    const subPlot = await this.subPlotService.findSubPlot(farmId, plotId, subPlotId);
 
-    const subPlot = await this.prisma.subPlot.findUnique({
+    const subPlotStatus = await this.prisma.subPlot.findUnique({
       where: {
         id: subPlotId,
         plot: { id: plotId, farmId: farmId },
@@ -59,7 +64,7 @@ export class TreesService {
       },
     });
 
-    if (subPlot?.status === 'COMPLETED') {
+    if (subPlotStatus?.status === 'COMPLETED') {
       throw new ForbiddenException({
         msg: 'A parcela foi concluída, você não pode adicionar mais árvores',
       });
@@ -76,10 +81,19 @@ export class TreesService {
       },
     });
 
+    await this.auditService.create(AuditAction.CREATE, AuditEntity.TREE, actor.id, {
+      farmId,
+      plotId,
+      plotName: subPlot.plot.name,
+      subPlotId,
+      subPlotName: subPlot.name,
+    });
+
     return tree;
   }
 
   async update(
+    actor: User,
     farmId: string,
     plotId: string,
     subPlotId: string,
@@ -94,7 +108,7 @@ export class TreesService {
       });
     }
 
-    return await this.prisma.tree.update({
+    const updatedTree = await this.prisma.tree.update({
       where: {
         id: treeId,
         subPlot: { id: subPlotId, plot: { id: plotId, farmId: farmId } },
@@ -107,9 +121,21 @@ export class TreesService {
         observations: dto.observations,
       },
     });
+
+    const subPlot = await this.subPlotService.findSubPlot(farmId, plotId, subPlotId);
+
+    await this.auditService.create(AuditAction.UPDATE, AuditEntity.TREE, actor.id, {
+      farmId,
+      plotId,
+      plotName: subPlot.plot.name,
+      subPlotId,
+      subPlotName: subPlot.name,
+    });
+
+    return updatedTree;
   }
 
-  async remove(farmId: string, plotId: string, subPlotId: string, treeId: string) {
+  async remove(actor: User, farmId: string, plotId: string, subPlotId: string, treeId: string) {
     const tree = await this.findTree(farmId, plotId, subPlotId, treeId);
 
     if (tree.subPlot.status === 'COMPLETED') {
@@ -123,6 +149,16 @@ export class TreesService {
         id: treeId,
         subPlot: { id: subPlotId, plot: { id: plotId, farmId: farmId } },
       },
+    });
+
+    const subPlot = await this.subPlotService.findSubPlot(farmId, plotId, subPlotId);
+
+    await this.auditService.create(AuditAction.DELETE, AuditEntity.TREE, actor.id, {
+      farmId,
+      plotId,
+      plotName: subPlot.plot.name,
+      subPlotId,
+      subPlotName: subPlot.name,
     });
   }
 }

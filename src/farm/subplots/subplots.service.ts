@@ -2,8 +2,11 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PlotsService } from '../plots/plots.service';
+import { AuditService } from '../../admin/audit/audit.service';
 
-import { SubPlotStatus } from 'src/generated/prisma/enums';
+import type { User } from 'src/generated/prisma/client';
+
+import { SubPlotStatus, AuditAction, AuditEntity } from 'src/generated/prisma/enums';
 
 import { CreateSubPlotDto } from './dto/CreateSubPlot.dto';
 import { UpdateSubPlotDto } from './dto/UpdateSubPlot.dto';
@@ -13,6 +16,7 @@ export class SubPlotsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly plotService: PlotsService,
+    private readonly auditService: AuditService,
   ) {}
 
   async findAll(farmId: string, plotId: string, search?: string) {
@@ -58,10 +62,10 @@ export class SubPlotsService {
     return subPlot;
   }
 
-  async create(farmId: string, plotId: string, dto: CreateSubPlotDto) {
-    await this.plotService.findPlot(farmId, plotId);
+  async create(actor: User, farmId: string, plotId: string, dto: CreateSubPlotDto) {
+    const plot = await this.plotService.findPlot(farmId, plotId);
 
-    return this.prisma.subPlot.create({
+    const subPlot = await this.prisma.subPlot.create({
       data: {
         plotId: plotId,
         name: dto.name,
@@ -69,9 +73,25 @@ export class SubPlotsService {
         targetTrees: dto.targetTrees,
       },
     });
+
+    await this.auditService.create(AuditAction.CREATE, AuditEntity.SUBPLOT, actor.id, {
+      targetSubPlotId: subPlot.id,
+      subPlotName: subPlot.name,
+      plotId: plot.id,
+      plotName: plot.name,
+      farmId: farmId,
+    });
+
+    return subPlot;
   }
 
-  async updateStatus(farmId: string, plotId: string, subPlotId: string, status: SubPlotStatus) {
+  async updateStatus(
+    actor: User,
+    farmId: string,
+    plotId: string,
+    subPlotId: string,
+    status: SubPlotStatus,
+  ) {
     const subPlot = await this.findSubPlot(farmId, plotId, subPlotId);
 
     if (subPlot.status === status) {
@@ -90,6 +110,18 @@ export class SubPlotsService {
       data: { status: status },
     });
 
+    const action = status === SubPlotStatus.COMPLETED ? AuditAction.COMPLETE : AuditAction.REOPEN;
+
+    await this.auditService.create(action, AuditEntity.SUBPLOT, actor.id, {
+      targetSubPlotId: subPlot.id,
+      subPlotName: subPlot.name,
+      plotId: plotId,
+      plotName: subPlot.plot.name,
+      previousStatus: subPlot.status,
+      newStatus: updatedSubPlot.status,
+      missingTrees: missingTrees,
+    });
+
     return {
       subPlot: updatedSubPlot,
       missingTrees,
@@ -100,8 +132,14 @@ export class SubPlotsService {
     };
   }
 
-  async update(farmId: string, plotId: string, subPlotId: string, dto: UpdateSubPlotDto) {
-    await this.findSubPlot(farmId, plotId, subPlotId);
+  async update(
+    actor: User,
+    farmId: string,
+    plotId: string,
+    subPlotId: string,
+    dto: UpdateSubPlotDto,
+  ) {
+    const previousSubPlot = await this.findSubPlot(farmId, plotId, subPlotId);
 
     const subPlot = await this.prisma.subPlot.update({
       where: {
@@ -115,17 +153,34 @@ export class SubPlotsService {
       },
     });
 
+    await this.auditService.create(AuditAction.UPDATE, AuditEntity.SUBPLOT, actor.id, {
+      targetSubPlotId: subPlot.id,
+      subPlotName: subPlot.name,
+      plotId: plotId,
+      plotName: previousSubPlot.plot.name,
+      previousName: previousSubPlot.name,
+      newName: subPlot.name,
+    });
+
     return subPlot;
   }
 
-  async remove(farmId: string, plotId: string, subPlotId: string) {
-    await this.findSubPlot(farmId, plotId, subPlotId);
+  async remove(actor: User, farmId: string, plotId: string, subPlotId: string) {
+    const subPlot = await this.findSubPlot(farmId, plotId, subPlotId);
 
     await this.prisma.subPlot.delete({
       where: {
         id: subPlotId,
         plot: { id: plotId, farmId: farmId },
       },
+    });
+
+    await this.auditService.create(AuditAction.DELETE, AuditEntity.SUBPLOT, actor.id, {
+      targetSubPlotId: subPlot.id,
+      subPlotName: subPlot.name,
+      plotId: plotId,
+      plotName: subPlot.plot.name,
+      farmId: farmId,
     });
   }
 }

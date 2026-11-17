@@ -9,6 +9,9 @@ import { CreateEquationDto } from './dto/create-equation.dto';
 import { UpdateEquationDto } from './dto/update-equation.dto';
 import { UpdateEquationStatusDto } from './dto/update-equation-status.dto';
 
+import { GetUser } from 'src/auth/decorator/currentUser.decorator';
+import type { User } from 'src/generated/prisma/client';
+
 @Controller('admin/equations')
 @Roles(Role.ADMIN, Role.SUPER_ADMIN)
 export class EquationsController {
@@ -16,8 +19,8 @@ export class EquationsController {
 
   // Cadastra uma nova equação
   @Post()
-  create(@Body() dto: CreateEquationDto) {
-    return this.equationsService.create(dto);
+  create(@GetUser() user: User, @Body() dto: CreateEquationDto) {
+    return this.equationsService.create(user, dto);
   }
 
   // Lista todas as equações
@@ -34,19 +37,23 @@ export class EquationsController {
 
   // Atualiza os dados de uma equação
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateEquationDto) {
-    return this.equationsService.update(id, dto);
+  update(@GetUser() user: User, @Param('id') id: string, @Body() dto: UpdateEquationDto) {
+    return this.equationsService.update(user, id, dto);
   }
 
   // Atualiza o status de uma equação
   @Patch(':id/status')
-  updateStatus(@Param('id') id: string, @Body() dto: UpdateEquationStatusDto) {
-    return this.equationsService.updateStatus(id, dto.isActive);
+  updateStatus(
+    @GetUser() user: User,
+    @Param('id') id: string,
+    @Body() dto: UpdateEquationStatusDto,
+  ) {
+    return this.equationsService.updateStatus(user, id, dto.isActive);
   }
 
   // Exclui uma equação
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.equationsService.remove(id);
+  remove(@GetUser() user: User, @Param('id') id: string) {
+    return this.equationsService.remove(user, id);
   }
 }
