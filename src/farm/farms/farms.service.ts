@@ -6,7 +6,7 @@ import { CreateFarmDto } from './dto/CreateFarm.dto';
 import { UpdateFarmDto } from './dto/UpdateFarm.dto';
 
 import type { User } from 'src/generated/prisma/client';
-import { AuditAction, AuditEntity } from 'src/generated/prisma/enums';
+import { AuditAction, AuditEntity, Role } from 'src/generated/prisma/enums';
 import { AuditService } from '../../admin/audit/audit.service';
 
 @Injectable()
@@ -16,12 +16,20 @@ export class FarmsService {
     private readonly auditService: AuditService,
   ) {}
 
-  async findAll(search?: string) {
+  async findAll(actor: User, search?: string) {
     const whereClause = search ? { contains: search, mode: 'insensitive' as const } : {};
 
     return await this.prisma.farm.findMany({
       where: {
         OR: [{ name: whereClause }, { owner: { name: whereClause } }],
+        ...(actor.role !== Role.ADMIN &&
+          actor.role !== Role.SUPER_ADMIN && {
+            userAccesses: {
+              some: {
+                userId: actor.id,
+              },
+            },
+          }),
       },
       orderBy: {
         createdAt: 'desc',
