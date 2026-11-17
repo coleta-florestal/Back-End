@@ -7,6 +7,7 @@ import { ProcessInventoryDto } from './dto/process-inventory.dto';
 import { ProcessPayloadDto } from './dto/process-payload.dto';
 import {
   InventoryProcessingResult,
+  PlotProcessingResult,
   ProcessingEquationContext,
   SubPlotProcessingResult,
   TreeProcessingResult,
@@ -16,6 +17,9 @@ interface PipelineSubPlotInput {
   id?: string;
   name: string;
   areaM2?: number;
+  plotId?: string;
+  plotName?: string;
+  plotAreaHa?: number;
   trees: Array<{
     id?: string;
     name?: string;
@@ -89,6 +93,9 @@ export class ProcessingService {
       id: sp.id,
       name: sp.name,
       areaM2: sp.areaM2 ?? undefined,
+      plotId: plot.id,
+      plotName: plot.name,
+      plotAreaHa: plot.areaHa,
       trees: sp.trees.map((t) => ({
         id: t.id,
         name: t.name,
@@ -106,6 +113,87 @@ export class ProcessingService {
         plotId: plot.id,
         plotName: plot.name,
         plotAreaHa: plot.areaHa,
+      },
+      equationContext,
+      subPlotsInput,
+      dto,
+    );
+  }
+
+  /**
+   * Processa o inventário completo de uma fazenda.
+   */
+  async processFarm(
+    farmId: string,
+    dto: ProcessInventoryDto = {},
+  ): Promise<InventoryProcessingResult> {
+    const farm = await this.prisma.farm.findUnique({
+      where: { id: farmId },
+      include: {
+        plots: {
+          include: {
+            subPlots: {
+              where: { status: SubPlotStatus.COMPLETED },
+              include: {
+                trees: true,
+              },
+              orderBy: { name: 'asc' },
+            },
+          },
+        },
+      },
+    });
+
+    if (!farm) {
+      throw new NotFoundException(`Fazenda com ID ${farmId} não encontrada.`);
+    }
+
+    if (farm.plots.length === 0) {
+      throw new BadRequestException('A fazenda não possui talhões cadastrados para processamento.');
+    }
+
+    const completedSubPlots = farm.plots.flatMap((plot) =>
+      plot.subPlots.map((sp) => ({
+        ...sp,
+        plotId: plot.id,
+        plotName: plot.name,
+        plotAreaHa: plot.areaHa,
+      })),
+    );
+
+    if (completedSubPlots.length === 0) {
+      throw new BadRequestException(
+        'A fazenda não possui parcelas concluídas. Conclua ao menos uma parcela para processar o inventário.',
+      );
+    }
+
+    const equationContext = await this.resolveEquationContext(dto);
+
+    const subPlotsInput: PipelineSubPlotInput[] = completedSubPlots.map((sp) => ({
+      id: sp.id,
+      name: sp.name,
+      areaM2: sp.areaM2 ?? undefined,
+      plotId: sp.plotId,
+      plotName: sp.plotName,
+      plotAreaHa: sp.plotAreaHa,
+      trees: sp.trees.map((t) => ({
+        id: t.id,
+        name: t.name,
+        diameterDapCm: t.diameterDapCm,
+        heightM: t.height,
+        quality: t.quality,
+        observations: t.observations ?? undefined,
+      })),
+    }));
+
+    const totalFarmAreaHa = farm.plots.reduce((total, plot) => total + plot.areaHa, 0);
+
+    return this.executePipeline(
+      {
+        farmId: farm.id,
+        farmName: farm.name,
+        plotName: 'Todos os talhões',
+        plotAreaHa: totalFarmAreaHa,
       },
       equationContext,
       subPlotsInput,
@@ -217,7 +305,7 @@ export class ProcessingService {
     const limits = dto.validationLimits;
     const subPlotsResults: SubPlotProcessingResult[] = [];
     const allProcessedTrees: TreeProcessingResult[] = [];
-
+    const plots: PlotProcessingResult[] = [];
     // Etapas: Árvore -> Validação -> Volume -> Parcela
     for (const subPlot of subPlotsInput) {
       const areaM2 = subPlot.areaM2 || dto.defaultParcelaAreaM2;
@@ -355,6 +443,8 @@ export class ProcessingService {
       subPlotsResults.push({
         id: subPlot.id,
         name: subPlot.name,
+        plotId: subPlot.plotId,
+        plotName: subPlot.plotName,
         areaM2,
         treeCount,
         validTreeCount,
@@ -366,6 +456,53 @@ export class ProcessingService {
         meanDapCm,
         meanHeightM,
         trees: dto.includeTreesInResult ? processedTrees : undefined,
+      });
+    }
+
+    const plotGroups = new Map<
+      string,
+      {
+        plotName: string;
+        plotAreaHa: number;
+        subPlots: SubPlotProcessingResult[];
+      }
+    >();
+
+    for (const subPlot of subPlotsResults) {
+      if (!subPlot.plotId || !subPlot.plotName) {
+        continue;
+      }
+
+      const originalSubPlot = subPlotsInput.find((sp) => sp.id === subPlot.id);
+
+      if (!originalSubPlot?.plotAreaHa) {
+        continue;
+      }
+
+      const group = plotGroups.get(subPlot.plotId);
+
+      if (group) {
+        group.subPlots.push(subPlot);
+      } else {
+        plotGroups.set(subPlot.plotId, {
+          plotName: subPlot.plotName,
+          plotAreaHa: originalSubPlot.plotAreaHa,
+          subPlots: [subPlot],
+        });
+      }
+    }
+
+    for (const [plotId, group] of plotGroups) {
+      const meanVolumePerHaM3 =
+        group.subPlots.reduce((total, sp) => total + sp.volumePerHa, 0) / group.subPlots.length;
+
+      plots.push({
+        plotId,
+        plotName: group.plotName,
+        plotAreaHa: group.plotAreaHa,
+        totalSubPlotsSampled: group.subPlots.length,
+        meanVolumePerHaM3,
+        estimatedTotalVolumeM3: meanVolumePerHaM3 * group.plotAreaHa,
       });
     }
 
@@ -497,6 +634,7 @@ export class ProcessingService {
       },
       qualityDistribution,
       diameterClasses,
+      plots,
       subPlots: subPlotsResults,
     };
   }

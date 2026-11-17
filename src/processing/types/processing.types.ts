@@ -26,6 +26,17 @@ export interface SubPlotProcessingResult {
   meanDapCm: number;
   meanHeightM: number | null;
   trees?: TreeProcessingResult[];
+  plotId?: string;
+  plotName?: string;
+}
+
+export interface PlotProcessingResult {
+  plotId: string;
+  plotName: string;
+  plotAreaHa: number;
+  totalSubPlotsSampled: number;
+  meanVolumePerHaM3: number;
+  estimatedTotalVolumeM3: number;
 }
 
 export interface DescriptiveStatistics {
@@ -115,5 +126,6 @@ export interface InventoryProcessingResult {
   };
   qualityDistribution: QualityClassResult[];
   diameterClasses: DiameterClassResult[];
+  plots: PlotProcessingResult[];
   subPlots: SubPlotProcessingResult[];
 }
