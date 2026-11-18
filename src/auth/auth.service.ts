@@ -32,6 +32,7 @@ export class AuthService {
         sub: user.id,
         email: user.email,
         role: user.role,
+        name: user.name,
       });
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -66,14 +67,15 @@ export class AuthService {
       });
     }
 
-    return this.signToken({ sub: user.id, email: user.email, role: user.role });
+    return this.signToken({ sub: user.id, email: user.email, role: user.role, name: user.name });
   }
 
-  private signToken({ sub, email, role }: PayloadDto) {
+  signToken({ sub, email, role, name }: PayloadDto) {
     const payload = {
       sub: sub,
       email: email,
       role: role,
+      name: name,
     };
 
     const token = this.jwt.sign(payload);
