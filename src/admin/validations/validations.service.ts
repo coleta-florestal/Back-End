@@ -1,13 +1,24 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateValidationSettingsDto } from './dto/update-validation-settings.dto';
 
+import type { User } from 'src/generated/prisma/client';
+import { AuditAction, AuditEntity } from 'src/generated/prisma/enums';
+
+import { AuditService } from 'src/admin/audit/audit.service';
+
 @Injectable()
 export class ValidationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditService: AuditService,
+  ) {}
 
   async findOne() {
-    const settings = await this.prisma.validationSettings.findUnique({ where: { id: 1 } });
+    const settings = await this.prisma.validationSettings.findUnique({
+      where: { id: 1 },
+    });
 
     if (!settings) {
       throw new NotFoundException('Os limites de validação ainda não foram configurados');
@@ -16,7 +27,7 @@ export class ValidationsService {
     return settings;
   }
 
-  async update(dto: UpdateValidationSettingsDto) {
+  async update(actor: User, dto: UpdateValidationSettingsDto) {
     if (dto.minDapCm >= dto.maxDapCm) {
       throw new BadRequestException('O DAP mínimo deve ser menor que o DAP máximo');
     }
@@ -25,10 +36,47 @@ export class ValidationsService {
       throw new BadRequestException('A altura mínima deve ser menor que a altura máxima');
     }
 
-    return this.prisma.validationSettings.upsert({
+    const previousSettings = await this.prisma.validationSettings.findUnique({
+      where: { id: 1 },
+    });
+
+    const updatedSettings = await this.prisma.validationSettings.upsert({
       where: { id: 1 },
       create: { id: 1, ...dto },
       update: dto,
     });
+
+    const hasChanges =
+      !previousSettings ||
+      previousSettings.minDapCm !== updatedSettings.minDapCm ||
+      previousSettings.maxDapCm !== updatedSettings.maxDapCm ||
+      previousSettings.minHeightM !== updatedSettings.minHeightM ||
+      previousSettings.maxHeightM !== updatedSettings.maxHeightM;
+
+    if (hasChanges) {
+      await this.auditService.create(
+        AuditAction.UPDATE,
+        AuditEntity.VALIDATION_SETTINGS,
+        actor.id,
+        {
+          previous: previousSettings
+            ? {
+                minDapCm: previousSettings.minDapCm,
+                maxDapCm: previousSettings.maxDapCm,
+                minHeightM: previousSettings.minHeightM,
+                maxHeightM: previousSettings.maxHeightM,
+              }
+            : null,
+          current: {
+            minDapCm: updatedSettings.minDapCm,
+            maxDapCm: updatedSettings.maxDapCm,
+            minHeightM: updatedSettings.minHeightM,
+            maxHeightM: updatedSettings.maxHeightM,
+          },
+        },
+      );
+    }
+
+    return updatedSettings;
   }
 }

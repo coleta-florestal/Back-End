@@ -30,6 +30,26 @@ enum AccountStatus {
   INACTIVE
 }
 
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  COMPLETE
+  REOPEN
+  APPROVE
+  REJECT
+}
+
+enum AuditEntity {
+  USER
+  FARM
+  PLOT
+  SUBPLOT
+  TREE
+  EQUATION
+  VALIDATION_SETTINGS
+}
+
 model User {
   id            String        @id @default(uuid())
   email         String        @unique
@@ -38,6 +58,8 @@ model User {
   password      String
 
   farms Farm[]
+  auditLogs AuditLog[]
+  farmAccesses UserFarm[] @relation("UserFarmAccess")
 
   accountStatus AccountStatus @default(ACTIVE) @map("account_status")
   status UserStatus @default(PENDING)
@@ -57,6 +79,7 @@ model Farm {
   
   ownerId String @map("owner_id") 
   owner User @relation(fields: [ownerId], references: [id])
+  userAccesses UserFarm[] @relation("UserFarmAccess")
 
   plots Plot[]
 
@@ -171,6 +194,7 @@ model VolumetricEquation {
   @@map("volumetric_equations")
 }
 
+
 model ValidationSettings {
   id         Int   @id @default(1)
   minDapCm   Float @map("min_dap_cm")
@@ -182,4 +206,33 @@ model ValidationSettings {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("validation_settings")
+}
+
+model AuditLog {
+  id        String      @id @default(uuid())
+  action    AuditAction
+  entity    AuditEntity
+  userId    String?     @map("user_id")
+  metadata  Json?
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model UserFarm {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  farmId    String   @map("farm_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation("UserFarmAccess", fields: [userId], references: [id], onDelete: Cascade)
+  farm Farm @relation("UserFarmAccess", fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, farmId])
+  @@index([farmId])
+  @@map("user_farms")
 }
