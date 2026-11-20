@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from "nodemailer"
-import { SendEmailDto } from './dto/sendEmailDto.dto';
 
 @Injectable()
 export class EmailService {
@@ -17,17 +16,16 @@ export class EmailService {
     }
 
     async verifyConnection() {
-        await this.transporter.verify()
-        return { message: "Conexão com gmail estabelecida" }
+        return this.transporter.verify()
     }
 
-    async sendPasswordReset(dto: SendEmailDto, token: string) {
+    async sendPasswordReset(email: string, token: string) {
         const frontURL = this.config.getOrThrow<string>("FRONTEND_URL")
         const resetLink = `${frontURL}/reset-password?token=${token}`
 
         await this.transporter.sendMail({
             from: this.config.getOrThrow<string>("MAIL_FROM"),
-            to: dto.email,
+            to: email,
             subject: 'Recuperação de senha',
             html: `
                 <h2>Recuperação de senha</h2>
