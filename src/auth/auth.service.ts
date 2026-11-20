@@ -54,13 +54,23 @@ export class AuthService {
         message: 'Credenciais inválidas',
       });
     }
-
+    
     const passwordMatches = await b.compare(dto.password, user.password);
-
+    
     if (!passwordMatches) {
       throw new UnauthorizedException({
         message: 'Credenciais inválidas',
       });
+    }
+    
+    if (user.status === "PENDING") {
+      throw new UnauthorizedException({
+        message: "Sua conta ainda está pendente de aprovação"
+      })
+    } else if (user.status === "REJECTED") {
+      throw new ForbiddenException({
+        message: "Sua conta foi rejeitada"
+      })
     }
 
     return this.signToken({ sub: user.id, email: user.email, role: user.role, name: user.name });
