@@ -15,4 +15,7 @@ export class EmailService {
         })
     }
 
+    async verifyConnection() {
+        return this.transporter.verify()
+    }
 }
