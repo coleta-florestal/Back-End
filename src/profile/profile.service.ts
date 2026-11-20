@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
 
 import { UpdateProfileDto } from './dto/UpdateProfile.dto';
+import * as b from 'bcrypt';
 
 @Injectable()
 export class ProfileService {
@@ -15,12 +16,14 @@ export class ProfileService {
 
   async updateProfile(userId: string, { email, name, password }: UpdateProfileDto) {
     try {
+      const hashedPassword = password ? await b.hash(password, 8) : undefined;
+
       const user = await this.prisma.user.update({
         where: { id: userId },
         data: {
           email: email,
           name: name,
-          password: password,
+          password: hashedPassword,
         },
       });
 

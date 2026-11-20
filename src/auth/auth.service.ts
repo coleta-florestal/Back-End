@@ -32,6 +32,9 @@ export class AuthService {
           password: hashedPassword,
           status: 'PENDING',
         },
+        omit: {
+          password: true,
+        },
       });
 
       return user;
@@ -76,8 +79,11 @@ export class AuthService {
       throw new ForbiddenException({
         message: 'Sua conta foi rejeitada',
       });
+    } else if (user.accountStatus === 'INACTIVE') {
+      throw new ForbiddenException({
+        message: 'Sua conta foi desativada',
+      });
     }
-
     return this.signToken({ sub: user.id, email: user.email, role: user.role, name: user.name });
   }
 
