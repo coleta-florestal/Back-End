@@ -28,7 +28,7 @@ import { EmailModule } from 'src/email/email.module';
         };
       },
     }),
-    EmailModule
+    EmailModule,
   ],
   controllers: [AuthController],
   providers: [
