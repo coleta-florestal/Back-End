@@ -25,12 +25,11 @@ export class AuthService {
           email: dto.email,
           name: dto.userName,
           password: hashedPassword,
-          status: "PENDING"
+          status: 'PENDING',
         },
       });
 
-      return user
-
+      return user;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -55,23 +54,23 @@ export class AuthService {
         message: 'Credenciais inválidas',
       });
     }
-    
+
     const passwordMatches = await b.compare(dto.password, user.password);
-    
+
     if (!passwordMatches) {
       throw new UnauthorizedException({
         message: 'Credenciais inválidas',
       });
     }
-    
-    if (user.status === "PENDING") {
+
+    if (user.status === 'PENDING') {
       throw new UnauthorizedException({
-        message: "Sua conta ainda está pendente de aprovação"
-      })
-    } else if (user.status === "REJECTED") {
+        message: 'Sua conta ainda está pendente de aprovação',
+      });
+    } else if (user.status === 'REJECTED') {
       throw new ForbiddenException({
-        message: "Sua conta foi rejeitada"
-      })
+        message: 'Sua conta foi rejeitada',
+      });
     }
 
     return this.signToken({ sub: user.id, email: user.email, role: user.role, name: user.name });
