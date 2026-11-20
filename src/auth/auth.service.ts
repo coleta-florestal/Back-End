@@ -2,19 +2,23 @@ import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/c
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 
 import { PrismaService } from 'src/prisma/prisma.service';
+import { EmailService } from 'src/email/email.service';
 import { JwtService } from '@nestjs/jwt';
 
 import * as b from 'bcrypt';
+import { randomBytes, createHash } from "crypto"
 
 import { SignUpDto } from './dto/SignUp.dto';
 import { SignInDto } from './dto/SignIn.dto';
 import { PayloadDto } from './dto/Payload.dto';
+import { ForgotPasswordDto } from './dto/ForgotPassword.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
+    private readonly email: EmailService
   ) {}
 
   async signup(dto: SignUpDto) {
@@ -90,4 +94,52 @@ export class AuthService {
       access_token: token,
     };
   }
+
+
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: dto.email,
+      },
+    });
+
+    if (!user) {
+      return {
+        message: 'Se o e-mail estiver cadastrado, você receberá um link de recuperação',
+      };
+    }
+
+    const token = randomBytes(32).toString('hex');
+
+    const tokenHash = createHash('sha256')
+      .update(token)
+      .digest('hex');
+
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+    await this.prisma.$transaction([
+      this.prisma.passwordResetToken.deleteMany({
+        where: {
+          userId: user.id,
+        },
+      }),
+      this.prisma.passwordResetToken.create({
+        data: {
+          tokenHash,
+          userId: user.id,
+          expiresAt,
+        },
+      }),
+    ]);
+
+    await this.email.sendPasswordReset(
+      user.email,
+      token,
+    );
+
+    return {
+      message: 'Se o e-mail estiver cadastrado, você receberá um link de recuperação',
+    };
+  }
+
 }

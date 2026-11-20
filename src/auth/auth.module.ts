@@ -11,6 +11,7 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './guard/jwt.guard';
 import { RolesGuard } from './guard/roles.guard';
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { RolesGuard } from './guard/roles.guard';
         };
       },
     }),
+    EmailModule
   ],
   controllers: [AuthController],
   providers: [

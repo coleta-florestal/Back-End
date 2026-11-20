@@ -6,6 +6,7 @@ import { SignUpDto } from './dto/SignUp.dto';
 import { SignInDto } from './dto/SignIn.dto';
 
 import { Public } from './decorator/public.decorator';
+import { ForgotPasswordDto } from './dto/ForgotPassword.dto';
 
 @Public()
 @Controller('auth')
@@ -20,5 +21,10 @@ export class AuthController {
   @Post('signin')
   signIn(@Body() dto: SignInDto) {
     return this.authService.singin(dto);
+  }
+
+  @Post('forgot-password')
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto);
   }
 }
