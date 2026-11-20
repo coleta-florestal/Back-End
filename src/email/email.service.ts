@@ -17,7 +17,8 @@ export class EmailService {
     }
 
     async verifyConnection() {
-        return this.transporter.verify()
+        await this.transporter.verify()
+        return { message: "Conexão com gmail estabelecida" }
     }
 
     async sendPasswordReset(dto: SendEmailDto, token: string) {
