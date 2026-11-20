@@ -13,11 +13,15 @@ export class ProfileService {
     private readonly authService: AuthService,
   ) {}
 
-  async updateProfile(userId: string, dto: UpdateProfileDto) {
+  async updateProfile(userId: string, { email, name, password }: UpdateProfileDto) {
     try {
       const user = await this.prisma.user.update({
         where: { id: userId },
-        data: dto,
+        data: {
+          email: email,
+          name: name,
+          password: password,
+        },
       });
 
       return this.authService.signToken({
