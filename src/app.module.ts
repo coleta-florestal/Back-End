@@ -7,6 +7,7 @@ import { ProfileModule } from './profile/profile.module';
 import { AdminModule } from './admin/admin.module';
 import { ProcessingModule } from './processing/processing.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     AdminModule,
     ProcessingModule,
     DashboardModule,
+    EmailModule,
   ],
   controllers: [],
   providers: [],
