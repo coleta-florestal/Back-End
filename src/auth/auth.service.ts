@@ -12,6 +12,7 @@ import { SignUpDto } from './dto/SignUp.dto';
 import { SignInDto } from './dto/SignIn.dto';
 import { PayloadDto } from './dto/Payload.dto';
 import { ForgotPasswordDto } from './dto/ForgotPassword.dto';
+import { ResetPasswordDto } from './dto/ResetPassword.dto';
 
 @Injectable()
 export class AuthService {
@@ -95,7 +96,6 @@ export class AuthService {
     };
   }
 
-
   async forgotPassword(dto: ForgotPasswordDto) {
     const user = await this.prisma.user.findUnique({
       where: {
@@ -141,5 +141,73 @@ export class AuthService {
       message: 'Se o e-mail estiver cadastrado, você receberá um link de recuperação',
     };
   }
+
+
+async resetPassword(dto: ResetPasswordDto) {
+  const tokenHash = createHash('sha256')
+    .update(dto.token)
+    .digest('hex');
+
+  const resetToken = await this.prisma.passwordResetToken.findUnique({
+    where: {
+      tokenHash,
+    },
+  });
+
+  if (
+    !resetToken ||
+    resetToken.usedAt ||
+    resetToken.expiresAt < new Date()
+  ) {
+    throw new ForbiddenException({
+      message: 'Token inválido ou expirado.',
+    });
+  }
+
+  const hashedPassword = await b.hash(dto.password, 8);
+
+  await this.prisma.$transaction(async (tx) => {
+    const result = await tx.passwordResetToken.updateMany({
+      where: {
+        id: resetToken.id,
+        usedAt: null,
+        expiresAt: {
+          gt: new Date(),
+        },
+      },
+      data: {
+        usedAt: new Date(),
+      },
+    });
+
+    if (result.count === 0) {
+      throw new ForbiddenException({
+        message: 'Token inválido ou expirado',
+      });
+    }
+
+    await tx.user.update({
+      where: {
+        id: resetToken.userId,
+      },
+      data: {
+        password: hashedPassword,
+      },
+    });
+
+    await tx.passwordResetToken.deleteMany({
+      where: {
+        userId: resetToken.userId,
+        id: {
+          not: resetToken.id,
+        },
+      },
+    });
+  });
+
+  return {
+    message: 'Senha redefinida com sucesso',
+  };
+}
 
 }
