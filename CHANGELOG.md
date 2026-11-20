@@ -1,3 +1,26 @@
+# [1.0.0-rc.6](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.5...v1.0.0-rc.6) (2026-11-20)
+
+### Features
+
+- **auth:** change authentication timing ([47c0cc2](https://github.com/coleta-florestal/Back-End/commit/47c0cc201311e3ee008d18e8a048f6598a2bce48))
+- **auth:** create forgot password method and route ([501dbf3](https://github.com/coleta-florestal/Back-End/commit/501dbf3bac961641a234a2132aeb2a760582d6b5))
+- **auth:** create reset password dto ([039bd0c](https://github.com/coleta-florestal/Back-End/commit/039bd0cf5be94acc8843ee10e3181191351927e5))
+- **auth:** create reset password methdo and route ([48266d9](https://github.com/coleta-florestal/Back-End/commit/48266d9ea3c2a5a7695c9fb8530fbabd44f6ec5a))
+- **auth:** define in signup the pending status in user ([bb55ecb](https://github.com/coleta-florestal/Back-End/commit/bb55ecb286bea167711dc3c50c9e281b7e69fca5))
+- **auth:** sign in now verifies if user is pending or not ([bf9d9d1](https://github.com/coleta-florestal/Back-End/commit/bf9d9d13ab741dd38fcfe93a381d58537f6107ec))
+- **auth:** signup does not return token anymore ([7418b66](https://github.com/coleta-florestal/Back-End/commit/7418b6687dc59191bb8d4bf5635cd9932af91253))
+- **email:** create email module ([e6f002a](https://github.com/coleta-florestal/Back-End/commit/e6f002a2818dc660f0aa95df58b66cfb4767502c))
+- **email:** create email transporter method ([638a9d1](https://github.com/coleta-florestal/Back-End/commit/638a9d146a5a27aa7ee04a3a869ec42013e15d2b))
+- **email:** create helper method ([42c5370](https://github.com/coleta-florestal/Back-End/commit/42c5370c76083a62634ba5f883ae1ec8fd47f32e))
+- **email:** create send email dto ([c3f62cb](https://github.com/coleta-florestal/Back-End/commit/c3f62cb45c829e328e2599e9d678006c23fb6f7b))
+- **email:** create send password reset method ([6c29cf3](https://github.com/coleta-florestal/Back-End/commit/6c29cf3f70d1fba06f7a7ae6b636c34124d9b895))
+- **email:** final email service usage ([ea29e91](https://github.com/coleta-florestal/Back-End/commit/ea29e911469de08966b91f33f89750daeed9b9b5))
+- **env:** add new env variables ([cd38722](https://github.com/coleta-florestal/Back-End/commit/cd38722f5085c3f303ed86c01a14b4603397ac25))
+- integrei o perfil do usuario ([7454e70](https://github.com/coleta-florestal/Back-End/commit/7454e70a3930ecceb54f6786b9c3efee0b32a447))
+- **prisma:** add password reset token to prisma migrations ([1ffacd5](https://github.com/coleta-florestal/Back-End/commit/1ffacd59c62f016695c0cb68434ecc23d3592732))
+- **profile:** add password to dto params ([d018e24](https://github.com/coleta-florestal/Back-End/commit/d018e24dffe00437cca2ff061d930e38162b871d))
+- **profile:** modify the way dto is passed in method ([79b2a06](https://github.com/coleta-florestal/Back-End/commit/79b2a06dc1e6067d2be0eaf2ddbf988369bfd495))
+
 # [1.0.0-rc.5](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.4...v1.0.0-rc.5) (2026-11-18)
 
 ### Bug Fixes
