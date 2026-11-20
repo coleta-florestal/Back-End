@@ -1,3 +1,28 @@
+# [1.0.0-rc.5](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.4...v1.0.0-rc.5) (2026-11-18)
+
+### Bug Fixes
+
+- **projects:** fix user auth to farms ([efe1399](https://github.com/coleta-florestal/Back-End/commit/efe139921caa574681494d185ab61d833dcdce56))
+
+### Features
+
+- **adudit:** add audit schema ([7ebefec](https://github.com/coleta-florestal/Back-End/commit/7ebefec3e7fc24941a0170b8d67487afea4d9188))
+- **audit:** add audit controller with routes and role restrictions ([4cb9e63](https://github.com/coleta-florestal/Back-End/commit/4cb9e63b2412aa6beb538d18574242ce129614e9))
+- **audit:** add audit service with findall and create methods ([03c0971](https://github.com/coleta-florestal/Back-End/commit/03c097135acbb8c79cfb1386296c3d29474917c9))
+- **audit:** add audit to equations module ([94f3f0a](https://github.com/coleta-florestal/Back-End/commit/94f3f0a439afea5d653cfc434cd2c131789c1d02))
+- **audit:** add audit to farms module ([72be310](https://github.com/coleta-florestal/Back-End/commit/72be31021d455a8b475edef542b5fbc94a8561d6))
+- **audit:** add audit to plots module ([deb49e4](https://github.com/coleta-florestal/Back-End/commit/deb49e45e3b741707959232674b4a6d74a87c660))
+- **audit:** add audit to subplots module ([af9bfe3](https://github.com/coleta-florestal/Back-End/commit/af9bfe3d1401249042c53e0412d471fe6b5234b7))
+- **audit:** add audit to trees module ([6a2cf2f](https://github.com/coleta-florestal/Back-End/commit/6a2cf2f92f14f9c01213481738cf119c87854029))
+- **audit:** add audit to user module ([7993505](https://github.com/coleta-florestal/Back-End/commit/7993505c13df0df49f7e15dd86562ef7f8d84b35))
+- **audit:** add audit to validations module ([bad5645](https://github.com/coleta-florestal/Back-End/commit/bad56455df25a27d6c3c1bc81152e758333dc923))
+- **audit:** add exports service in audit module ([2eb0d7d](https://github.com/coleta-florestal/Back-End/commit/2eb0d7d47f4c5b88d506c02ada02a00290270bd3))
+- **projects:** add projects modules ([f3ef264](https://github.com/coleta-florestal/Back-End/commit/f3ef26447845c8a2499f91516af4b94bdd224ac5))
+- **projects:** add user and farm relation on schema ([2db5f88](https://github.com/coleta-florestal/Back-End/commit/2db5f88cc2ef94f48151404a3ae58a25a4ece51d))
+- **projects:** export user service to use in projects ([37c8ba6](https://github.com/coleta-florestal/Back-End/commit/37c8ba6afb957310d59e1e9c182607feba5e26c0))
+- **projects:** import farms and user module ([2532424](https://github.com/coleta-florestal/Back-End/commit/2532424d5308749a7c00e4ccf6960d60c9f9c164))
+- **results:** add results processing to farms ([e431889](https://github.com/coleta-florestal/Back-End/commit/e43188905a956ce5589ccdca0d0301d1897078c7))
+
 # [1.0.0-rc.4](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.3...v1.0.0-rc.4) (2026-11-11)
 
 ### Bug Fixes
