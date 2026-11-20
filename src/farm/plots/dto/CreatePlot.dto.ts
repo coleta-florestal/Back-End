@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString } from 'class-validator';
 
 export class CreatePlotDto {
   @IsNotEmpty()
@@ -11,5 +11,6 @@ export class CreatePlotDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @IsPositive()
   areaHA!: number;
 }
