@@ -22,7 +22,7 @@ import { EmailModule } from 'src/email/email.module';
         return {
           secret: config.get('JWT_SECRET'),
           signOptions: {
-            expiresIn: '60m',
+            expiresIn: '8h',
             algorithm: 'HS256',
           },
         };
