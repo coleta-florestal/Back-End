@@ -11,6 +11,7 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './guard/jwt.guard';
 import { RolesGuard } from './guard/roles.guard';
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
   imports: [
@@ -21,12 +22,13 @@ import { RolesGuard } from './guard/roles.guard';
         return {
           secret: config.get('JWT_SECRET'),
           signOptions: {
-            expiresIn: '60m',
+            expiresIn: '8h',
             algorithm: 'HS256',
           },
         };
       },
     }),
+    EmailModule,
   ],
   controllers: [AuthController],
   providers: [
