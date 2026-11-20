@@ -21,7 +21,7 @@ import { RolesGuard } from './guard/roles.guard';
         return {
           secret: config.get('JWT_SECRET'),
           signOptions: {
-            expiresIn: '15m',
+            expiresIn: '60m',
             algorithm: 'HS256',
           },
         };
