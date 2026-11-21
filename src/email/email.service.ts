@@ -28,23 +28,23 @@ export class EmailService {
       to: email,
       subject: 'Recuperação de senha',
       html: `
-                <h2>Recuperação de senha</h2>
+          <h2>Recuperação de senha</h2>
 
-                <p>Recebemos uma solicitação para redefinir sua senha.</p>
+          <p>Recebemos uma solicitação para redefinir sua senha.</p>
 
-                <p>Clique no botão abaixo para continuar:</p>
+          <p>Clique no botão abaixo para continuar:</p>
 
-                <a href="${resetLink}">
-                Redefinir senha
-                </a>
+          <a href="${resetLink}">
+          Redefinir senha
+          </a>
 
-                <p>Este link expira em 15 minutos.</p>
+          <p>Este link expira em 15 minutos.</p>
 
-                <p>
-                Caso não tenha solicitado a recuperação,
-                ignore este e-mail.
-                </p>
-            `,
+          <p>
+          Caso não tenha solicitado a recuperação,
+          ignore este e-mail.
+          </p>
+      `,
     });
   }
 }

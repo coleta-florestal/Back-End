@@ -35,8 +35,8 @@ export class AuthService {
       });
 
       return {
-        message: "Solicitação de conta enviada"
-      }
+        message: 'Solicitação de conta enviada',
+      };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -197,6 +197,6 @@ export class AuthService {
 
     return {
       message: 'Senha redefinida com sucesso',
-    }
+    };
   }
 }
