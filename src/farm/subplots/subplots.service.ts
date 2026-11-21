@@ -1,4 +1,9 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PlotsService } from '../plots/plots.service';
@@ -6,7 +11,7 @@ import { AuditService } from '../../admin/audit/audit.service';
 
 import type { User } from 'src/generated/prisma/client';
 
-import { SubPlotStatus, AuditAction, AuditEntity } from 'src/generated/prisma/enums';
+import { PlotStatus, SubPlotStatus, AuditAction, AuditEntity } from 'src/generated/prisma/enums';
 
 import { CreateSubPlotDto } from './dto/CreateSubPlot.dto';
 import { UpdateSubPlotDto } from './dto/UpdateSubPlot.dto';
@@ -65,6 +70,12 @@ export class SubPlotsService {
   async create(actor: User, farmId: string, plotId: string, dto: CreateSubPlotDto) {
     const plot = await this.plotService.findPlot(farmId, plotId);
 
+    if (plot.status === PlotStatus.FINISHED) {
+      throw new ForbiddenException(
+        'O talhão está finalizado e não permite o cadastro de novas parcelas.',
+      );
+    }
+
     const subPlot = await this.prisma.subPlot.create({
       data: {
         plotId: plotId,
@@ -93,6 +104,12 @@ export class SubPlotsService {
     status: SubPlotStatus,
   ) {
     const subPlot = await this.findSubPlot(farmId, plotId, subPlotId);
+
+    if (subPlot.plot.status === PlotStatus.FINISHED) {
+      throw new ForbiddenException(
+        'Não é possível alterar o status de uma parcela em um talhão finalizado.',
+      );
+    }
 
     if (subPlot.status === status) {
       throw new ConflictException(
