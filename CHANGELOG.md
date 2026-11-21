@@ -1,3 +1,11 @@
+# [1.0.0-rc.7](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.6...v1.0.0-rc.7) (2026-11-21)
+
+### Bug Fixes
+
+- **auth:** fix auth ([cfc03f0](https://github.com/coleta-florestal/Back-End/commit/cfc03f051540ff95fca3b217c9d0eaa5791c0341))
+- **auth:** modify return in sign up methdo ([bdaa500](https://github.com/coleta-florestal/Back-End/commit/bdaa5006b45af39b523dd12459330722150d335c))
+- **profile:** add hashing to update profile password ([63fd31f](https://github.com/coleta-florestal/Back-End/commit/63fd31fdcac8e5db42fb112096d8a8565a82400b))
+
 # [1.0.0-rc.6](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.5...v1.0.0-rc.6) (2026-11-20)
 
 ### Features
