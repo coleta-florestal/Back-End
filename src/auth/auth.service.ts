@@ -125,9 +125,9 @@ export class AuthService {
       }),
       this.prisma.passwordResetToken.create({
         data: {
-          tokenHash,
+          tokenHash: tokenHash,
           userId: user.id,
-          expiresAt,
+          expiresAt: expiresAt,
         },
       }),
     ]);
@@ -144,13 +144,13 @@ export class AuthService {
 
     const resetToken = await this.prisma.passwordResetToken.findUnique({
       where: {
-        tokenHash,
+        tokenHash: tokenHash,
       },
     });
 
     if (!resetToken || resetToken.usedAt || resetToken.expiresAt < new Date()) {
       throw new ForbiddenException({
-        message: 'Token inválido ou expirado.',
+        message: 'Token inválido ou expirado',
       });
     }
 
@@ -197,6 +197,6 @@ export class AuthService {
 
     return {
       message: 'Senha redefinida com sucesso',
-    };
+    }
   }
 }
