@@ -3,7 +3,9 @@ import { ProcessingService } from './processing.service';
 import { ProcessInventoryDto } from './dto/process-inventory.dto';
 import { ProcessPayloadDto } from './dto/process-payload.dto';
 import { InventoryProcessingResult } from './types/processing.types';
+import { GetUser } from 'src/auth/decorator/currentUser.decorator';
 import { Roles } from 'src/auth/decorator/roles.decorator';
+import type { User } from 'src/generated/prisma/client';
 import { Role } from 'src/generated/prisma/enums';
 
 @Controller('processing')
@@ -13,19 +15,21 @@ export class ProcessingController {
 
   @Post('plots/:plotId')
   processPlot(
+    @GetUser() user: User,
     @Param('plotId', ParseUUIDPipe) plotId: string,
     @Body() dto: ProcessInventoryDto,
   ): Promise<InventoryProcessingResult> {
-    return this.processingService.processPlot(plotId, dto);
+    return this.processingService.processPlot(plotId, dto, undefined, { actor: user });
   }
 
   @Post('farms/:farmId/plots/:plotId')
   processFarmPlot(
+    @GetUser() user: User,
     @Param('farmId', ParseUUIDPipe) farmId: string,
     @Param('plotId', ParseUUIDPipe) plotId: string,
     @Body() dto: ProcessInventoryDto,
   ): Promise<InventoryProcessingResult> {
-    return this.processingService.processPlot(plotId, dto, farmId);
+    return this.processingService.processPlot(plotId, dto, farmId, { actor: user });
   }
 
   @Post('farms/:farmId')

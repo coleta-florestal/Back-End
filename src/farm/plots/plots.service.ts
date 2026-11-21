@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FarmsService } from '../farms/farms.service';
@@ -66,6 +66,17 @@ export class PlotsService {
   async create(actor: User, farmId: string, dto: CreatePlotDto) {
     const farm = await this.farmService.findFarm(farmId);
 
+    const existingPlot = await this.prisma.plot.findFirst({
+      where: {
+        farmId,
+        name: { equals: dto.name.trim(), mode: 'insensitive' },
+      },
+    });
+
+    if (existingPlot) {
+      throw new ConflictException('Já existe um talhão com este nome na fazenda.');
+    }
+
     const plot = await this.prisma.plot.create({
       data: {
         farmId: farmId,
@@ -87,6 +98,20 @@ export class PlotsService {
 
   async update(actor: User, farmId: string, plotId: string, dto: UpdatePlotDto) {
     const previousPlot = await this.findPlot(farmId, plotId);
+
+    if (dto.name) {
+      const existingPlot = await this.prisma.plot.findFirst({
+        where: {
+          farmId,
+          name: { equals: dto.name.trim(), mode: 'insensitive' },
+          id: { not: plotId },
+        },
+      });
+
+      if (existingPlot) {
+        throw new ConflictException('Já existe um talhão com este nome na fazenda.');
+      }
+    }
 
     const plot = await this.prisma.plot.update({
       where: {

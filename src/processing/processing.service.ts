@@ -1,8 +1,17 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EquationsService } from 'src/admin/equations/equations.service';
+import { AuditService } from 'src/admin/audit/audit.service';
 import { StatisticsService } from './statistics.service';
-import { EquationType, SubPlotStatus, TreeQuality } from 'src/generated/prisma/enums';
+import type { User } from 'src/generated/prisma/client';
+import {
+  AuditAction,
+  AuditEntity,
+  EquationType,
+  PlotStatus,
+  SubPlotStatus,
+  TreeQuality,
+} from 'src/generated/prisma/enums';
 import { ProcessInventoryDto } from './dto/process-inventory.dto';
 import { ProcessPayloadDto } from './dto/process-payload.dto';
 import {
@@ -12,6 +21,15 @@ import {
   SubPlotProcessingResult,
   TreeProcessingResult,
 } from './types/processing.types';
+
+export interface ProcessPlotOptions {
+  /** Atualiza plot.status para FINISHED ao concluir o processamento. Padrão: true. */
+  finalizePlot?: boolean;
+  /** Exige todas as parcelas concluídas e mínimo de 2 parcelas concluídas. Padrão: true. */
+  enforceCompletionRules?: boolean;
+  /** Usuário autenticado que disparou o processamento (para registro em auditoria). */
+  actor?: User;
+}
 
 interface PipelineSubPlotInput {
   id?: string;
@@ -44,6 +62,7 @@ export class ProcessingService {
     private readonly prisma: PrismaService,
     private readonly equationsService: EquationsService,
     private readonly statisticsService: StatisticsService,
+    private readonly auditService: AuditService,
   ) {}
 
   /**
@@ -53,7 +72,10 @@ export class ProcessingService {
     plotId: string,
     dto: ProcessInventoryDto = {},
     farmId?: string,
+    options: ProcessPlotOptions = {},
   ): Promise<InventoryProcessingResult> {
+    const { finalizePlot = true, enforceCompletionRules = true, actor } = options;
+
     const plot = await this.prisma.plot.findUnique({
       where: { id: plotId },
       include: {
@@ -81,7 +103,21 @@ export class ProcessingService {
 
     const completedSubPlots = plot.subPlots.filter((sp) => sp.status === SubPlotStatus.COMPLETED);
 
-    if (completedSubPlots.length === 0) {
+    if (enforceCompletionRules) {
+      const openSubPlots = plot.subPlots.filter((sp) => sp.status !== SubPlotStatus.COMPLETED);
+
+      if (openSubPlots.length > 0) {
+        throw new BadRequestException(
+          `Encerre todas as parcelas antes de finalizar a amostra. Parcelas pendentes: ${openSubPlots.map((sp) => sp.name).join(', ')}.`,
+        );
+      }
+
+      if (completedSubPlots.length < 2) {
+        throw new BadRequestException(
+          'São necessárias pelo menos 2 parcelas concluídas para processar o inventário.',
+        );
+      }
+    } else if (completedSubPlots.length === 0) {
       throw new BadRequestException(
         'O talhão não possui parcelas concluídas. Conclua ao menos uma parcela para processar o inventário.',
       );
@@ -106,7 +142,7 @@ export class ProcessingService {
       })),
     }));
 
-    return this.executePipeline(
+    const result = this.executePipeline(
       {
         farmId: plot.farmId,
         farmName: plot.farm?.name,
@@ -118,6 +154,25 @@ export class ProcessingService {
       subPlotsInput,
       dto,
     );
+
+    if (finalizePlot && plot.status !== PlotStatus.FINISHED) {
+      await this.prisma.plot.update({
+        where: { id: plot.id },
+        data: { status: PlotStatus.FINISHED },
+      });
+
+      if (actor) {
+        await this.auditService.create(AuditAction.COMPLETE, AuditEntity.PLOT, actor.id, {
+          targetPlotId: plot.id,
+          plotName: plot.name,
+          farmId: plot.farmId,
+          previousStatus: plot.status,
+          newStatus: PlotStatus.FINISHED,
+        });
+      }
+    }
+
+    return result;
   }
 
   /**

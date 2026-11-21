@@ -166,6 +166,7 @@ export class DashboardService {
           plot.id,
           { equationId: activeEquationId },
           farmId,
+          { finalizePlot: false, enforceCompletionRules: false },
         );
       } catch (error) {
         // Falha em um talhão não deve derrubar o dashboard inteiro.
