@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -80,6 +80,16 @@ export class FarmsService {
       throw new NotFoundException('Usuário não encontrado');
     }
 
+    const existingFarm = await this.prisma.farm.findFirst({
+      where: {
+        name: { equals: dto.name.trim(), mode: 'insensitive' },
+      },
+    });
+
+    if (existingFarm) {
+      throw new ConflictException('Já existe uma fazenda com este nome');
+    }
+
     const farm = await this.prisma.farm.create({
       data: {
         name: dto.name,
@@ -99,6 +109,19 @@ export class FarmsService {
 
   async update(actor: User, farmId: string, dto: UpdateFarmDto) {
     const previousFarm = await this.findFarm(farmId);
+
+    if (dto.name) {
+      const existingFarm = await this.prisma.farm.findFirst({
+        where: {
+          name: { equals: dto.name.trim(), mode: 'insensitive' },
+          id: { not: farmId },
+        },
+      });
+
+      if (existingFarm) {
+        throw new ConflictException('Já existe uma fazenda com este nome');
+      }
+    }
 
     const farm = await this.prisma.farm.update({
       where: {

@@ -1,4 +1,9 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PlotsService } from '../plots/plots.service';
@@ -6,7 +11,7 @@ import { AuditService } from '../../admin/audit/audit.service';
 
 import type { User } from 'src/generated/prisma/client';
 
-import { SubPlotStatus, AuditAction, AuditEntity } from 'src/generated/prisma/enums';
+import { PlotStatus, SubPlotStatus, AuditAction, AuditEntity } from 'src/generated/prisma/enums';
 
 import { CreateSubPlotDto } from './dto/CreateSubPlot.dto';
 import { UpdateSubPlotDto } from './dto/UpdateSubPlot.dto';
@@ -141,6 +146,14 @@ export class SubPlotsService {
   ) {
     const previousSubPlot = await this.findSubPlot(farmId, plotId, subPlotId);
 
+    if (previousSubPlot.plot.status === PlotStatus.FINISHED) {
+      throw new ForbiddenException('Não é possível editar uma parcela de um talhão finalizado.');
+    }
+
+    if (previousSubPlot.status === SubPlotStatus.COMPLETED) {
+      throw new ForbiddenException('Não é possível editar uma parcela concluída.');
+    }
+
     const subPlot = await this.prisma.subPlot.update({
       where: {
         id: subPlotId,
@@ -167,6 +180,20 @@ export class SubPlotsService {
 
   async remove(actor: User, farmId: string, plotId: string, subPlotId: string) {
     const subPlot = await this.findSubPlot(farmId, plotId, subPlotId);
+
+    if (subPlot.plot.status === PlotStatus.FINISHED) {
+      throw new ForbiddenException('Não é possível excluir uma parcela de um talhão finalizado.');
+    }
+
+    if (subPlot.status === SubPlotStatus.COMPLETED) {
+      throw new ForbiddenException('Não é possível excluir uma parcela concluída.');
+    }
+
+    if (subPlot._count.trees > 0) {
+      throw new ForbiddenException(
+        'Não é possível excluir uma parcela que possui árvores cadastradas.',
+      );
+    }
 
     await this.prisma.subPlot.delete({
       where: {

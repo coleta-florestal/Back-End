@@ -64,7 +64,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Usuário não encontrado');
     }
 
     return user;
@@ -75,15 +75,15 @@ export class UsersService {
     const user = await this.findById(id);
 
     if (user.status !== UserStatus.APPROVED) {
-      throw new ConflictException('User is not approved');
+      throw new ConflictException('Usuário não está aprovado');
     }
 
     if (user.role === Role.SUPER_ADMIN) {
-      throw new ForbiddenException('The SUPER_ADMIN role cannot be changed');
+      throw new ForbiddenException('O papel do SUPER_ADMIN não pode ser alterado');
     }
 
     if (actor.role === Role.ADMIN && dto.role !== Role.USER) {
-      throw new ForbiddenException('ADMIN can only assign USER role');
+      throw new ForbiddenException('ADMIN só pode atribuir o papel USER');
     }
 
     const updatedUser = await this.prisma.user.update({
@@ -104,7 +104,7 @@ export class UsersService {
   // Aprova uma solicitação de acesso
   async approve(actor: User, id: string, dto: ApproveUserDto) {
     if (actor.role === Role.ADMIN && dto.role !== Role.USER) {
-      throw new ForbiddenException('ADMIN can only approve users as USER');
+      throw new ForbiddenException('ADMIN só pode aprovar usuários como USER');
     }
 
     const result = await this.prisma.user.updateMany({
@@ -122,7 +122,7 @@ export class UsersService {
     if (result.count === 0) {
       await this.findById(id);
 
-      throw new ConflictException('User does not have a pending request');
+      throw new ConflictException('O usuário não possui uma solicitação pendente');
     }
 
     const approvedUser = await this.findById(id);
@@ -150,15 +150,16 @@ export class UsersService {
     if (result.count === 0) {
       await this.findById(id);
 
-      throw new ConflictException('User does not have a pending request');
+      throw new ConflictException('O usuário não possui uma solicitação pendente');
     }
 
     await this.auditService.create(AuditAction.REJECT, AuditEntity.USER, actor.id, {
       targetUserId: id,
     });
 
-    return { message: 'User request rejected successfully' };
+    return { message: 'Solicitação do usuário recusada com sucesso' };
   }
+
   // Ativa uma conta
   async activate(actor: User, id: string) {
     return this.changeAccountStatus(actor, id, AccountStatus.ACTIVE);
@@ -174,15 +175,35 @@ export class UsersService {
     const user = await this.findById(id);
 
     if (user.status !== UserStatus.APPROVED) {
-      throw new ConflictException('User is not approved');
+      throw new ConflictException('Usuário não está aprovado');
     }
 
     if (user.role === Role.SUPER_ADMIN) {
-      throw new ForbiddenException('The SUPER_ADMIN account cannot be modified');
+      throw new ForbiddenException('A conta do SUPER_ADMIN não pode ser modificada');
+    }
+
+    if (accountStatus === AccountStatus.INACTIVE && actor.id === id) {
+      throw new ForbiddenException('Você não pode desativar sua própria conta');
+    }
+
+    if (accountStatus === AccountStatus.INACTIVE && user.role === Role.ADMIN) {
+      const activeAdmins = await this.prisma.user.count({
+        where: {
+          role: { in: [Role.ADMIN, Role.SUPER_ADMIN] },
+          status: UserStatus.APPROVED,
+          accountStatus: AccountStatus.ACTIVE,
+        },
+      });
+
+      if (activeAdmins <= 1) {
+        throw new ForbiddenException('Não é possível desativar o único administrador ativo');
+      }
     }
 
     if (user.accountStatus === accountStatus) {
-      throw new ConflictException(`User account is already ${accountStatus.toLowerCase()}`);
+      throw new ConflictException(
+        `A conta do usuário já está ${accountStatus === AccountStatus.ACTIVE ? 'ativa' : 'inativa'}`,
+      );
     }
 
     const updatedUser = await this.prisma.user.update({
@@ -205,11 +226,29 @@ export class UsersService {
     const target = await this.findById(id);
 
     if (target.role === Role.SUPER_ADMIN) {
-      throw new ForbiddenException('The SUPER_ADMIN cannot be removed');
+      throw new ForbiddenException('O SUPER_ADMIN não pode ser removido');
+    }
+
+    if (actor.id === id) {
+      throw new ForbiddenException('Você não pode remover sua própria conta');
+    }
+
+    if (target.role === Role.ADMIN && target.accountStatus === AccountStatus.ACTIVE) {
+      const activeAdmins = await this.prisma.user.count({
+        where: {
+          role: { in: [Role.ADMIN, Role.SUPER_ADMIN] },
+          status: UserStatus.APPROVED,
+          accountStatus: AccountStatus.ACTIVE,
+        },
+      });
+
+      if (activeAdmins <= 1) {
+        throw new ForbiddenException('Não é possível remover o único administrador ativo');
+      }
     }
 
     if (target.status !== UserStatus.APPROVED) {
-      throw new ConflictException('User is not approved');
+      throw new ConflictException('Usuário não está aprovado');
     }
 
     await this.prisma.user.delete({
@@ -223,7 +262,7 @@ export class UsersService {
       role: target.role,
     });
 
-    return { message: 'User removed successfully' };
+    return { message: 'Usuário removido com sucesso' };
   }
 
   // Busca usuário por ID (uso interno)
@@ -236,7 +275,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Usuário não encontrado');
     }
 
     return user;
