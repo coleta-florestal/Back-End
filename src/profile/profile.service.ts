@@ -4,8 +4,15 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthService } from 'src/auth/auth.service';
 
-import { UpdateProfileDto } from './dto/UpdateProfile.dto';
 import * as b from 'bcrypt';
+
+import { UpdateProfileDto } from './dto/UpdateProfile.dto';
+
+interface Data {
+  name?: string;
+  email?: string;
+  password?: string;
+}
 
 @Injectable()
 export class ProfileService {
@@ -16,14 +23,21 @@ export class ProfileService {
 
   async updateProfile(userId: string, { email, name, password }: UpdateProfileDto) {
     try {
-      const hashedPassword = password ? await b.hash(password, 8) : undefined;
+      const data: Data = {
+        email: email,
+        name: name,
+      };
+
+      if (password) {
+        data.password = await b.hash(password, 8);
+      }
 
       const user = await this.prisma.user.update({
         where: { id: userId },
         data: {
-          email: email,
-          name: name,
-          password: hashedPassword,
+          email: data.email,
+          name: data.name,
+          password: data.password,
         },
       });
 
