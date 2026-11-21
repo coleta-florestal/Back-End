@@ -25,7 +25,7 @@ export class AuthService {
   async signup(dto: SignUpDto) {
     try {
       const hashedPassword = await b.hash(dto.password, 8);
-      const user = await this.prisma.user.create({
+      await this.prisma.user.create({
         data: {
           email: dto.email,
           name: dto.userName,
@@ -34,7 +34,9 @@ export class AuthService {
         },
       });
 
-      return user;
+      return {
+        message: "Solicitação de conta enviada"
+      }
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
