@@ -1,3 +1,9 @@
+# [1.0.0-rc.10](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.9...v1.0.0-rc.10) (2026-11-21)
+
+### Bug Fixes
+
+- **trees:** enforce validation limits and plot/subplot status checks ([1e02831](https://github.com/coleta-florestal/Back-End/commit/1e02831d944a0ffa65deed4826da063678c2b84d))
+
 # [1.0.0-rc.9](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.8...v1.0.0-rc.9) (2026-11-21)
 
 ### Bug Fixes
