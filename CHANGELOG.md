@@ -1,3 +1,9 @@
+# [1.0.0-rc.9](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.8...v1.0.0-rc.9) (2026-11-21)
+
+### Bug Fixes
+
+- **processing:** enforce subplot completion rules and finalize plot ([0f69ee5](https://github.com/coleta-florestal/Back-End/commit/0f69ee51ac52a486da58e38516fa4ddcd3fa72d2))
+
 # [1.0.0-rc.8](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.7...v1.0.0-rc.8) (2026-11-21)
 
 ### Bug Fixes
