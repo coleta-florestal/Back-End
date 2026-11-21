@@ -1,3 +1,12 @@
+# [1.0.0-rc.8](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.7...v1.0.0-rc.8) (2026-11-21)
+
+### Bug Fixes
+
+- **auth:** block inactive users, omit password on signup and hash password on profile update ([4fecc03](https://github.com/coleta-florestal/Back-End/commit/4fecc03b262a867a626c64fa4c8267be51ee0e1a))
+- **farm:** prevent duplicate farm and plot names and validate positive plot area ([5d430f5](https://github.com/coleta-florestal/Back-End/commit/5d430f501035b87108e0bea6920338e64d851f92))
+- **subplots:** block update and deletion of completed or non-empty subplots ([8c618c7](https://github.com/coleta-florestal/Back-End/commit/8c618c7e960d9c72dd22b2b14f7aa717e9d3ffd5))
+- **users:** block self or last admin deactivation and translate messages ([c11efeb](https://github.com/coleta-florestal/Back-End/commit/c11efebb3c836c822c02660415be12f2a618c6fd))
+
 # [1.0.0-rc.7](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.6...v1.0.0-rc.7) (2026-11-21)
 
 ### Bug Fixes
