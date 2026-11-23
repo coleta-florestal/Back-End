@@ -1,3 +1,9 @@
+# [1.0.0-rc.11](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.10...v1.0.0-rc.11) (2026-11-23)
+
+### Features
+
+- **profile:** adiciona GET /profile com o usuário atual ([f43e1f0](https://github.com/coleta-florestal/Back-End/commit/f43e1f0b9467a4fd6cf5ccf625d8ecc7dcd24308))
+
 # [1.0.0-rc.10](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.9...v1.0.0-rc.10) (2026-11-21)
 
 ### Bug Fixes
