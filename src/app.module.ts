@@ -7,6 +7,7 @@ import { ProfileModule } from './profile/profile.module';
 import { AdminModule } from './admin/admin.module';
 import { ProcessingModule } from './processing/processing.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     ProcessingModule,
     DashboardModule,
   ],
-  controllers: [],
+  controllers: [HealthController],
   providers: [],
 })
 export class AppModule {}
