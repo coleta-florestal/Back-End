@@ -15,4 +15,8 @@ export class PayloadDto {
   @IsEnum(Role)
   @IsNotEmpty()
   role!: Role;
+
+  @IsString()
+  @IsNotEmpty()
+  name!: string;
 }
