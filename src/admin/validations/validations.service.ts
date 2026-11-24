@@ -79,4 +79,29 @@ export class ValidationsService {
 
     return updatedSettings;
   }
+
+  async validateTreeMeasurements(diameterDapCm?: number, height?: number) {
+    const settings = await this.prisma.validationSettings.findUnique({
+      where: { id: 1 },
+    });
+
+    if (!settings) {
+      return;
+    }
+
+    if (
+      diameterDapCm !== undefined &&
+      (diameterDapCm < settings.minDapCm || diameterDapCm > settings.maxDapCm)
+    ) {
+      throw new BadRequestException(
+        `DAP deve estar entre ${settings.minDapCm} cm e ${settings.maxDapCm} cm.`,
+      );
+    }
+
+    if (height !== undefined && (height < settings.minHeightM || height > settings.maxHeightM)) {
+      throw new BadRequestException(
+        `Altura deve estar entre ${settings.minHeightM} m e ${settings.maxHeightM} m.`,
+      );
+    }
+  }
 }

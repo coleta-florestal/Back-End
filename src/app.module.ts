@@ -8,6 +8,7 @@ import { AdminModule } from './admin/admin.module';
 import { ProcessingModule } from './processing/processing.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { HealthController } from './health.controller';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { HealthController } from './health.controller';
     AdminModule,
     ProcessingModule,
     DashboardModule,
+    EmailModule,
   ],
   controllers: [HealthController],
   providers: [],
