@@ -5,6 +5,7 @@ export interface TreeProcessingResult {
   name?: string;
   diameterDapCm: number;
   heightM: number | null;
+  heightSource: 'MEASURED' | 'ESTIMATED' | 'MISSING';
   quality: TreeQuality;
   volumeM3: number;
   basalAreaM2: number;
