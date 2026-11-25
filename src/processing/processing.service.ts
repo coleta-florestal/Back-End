@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { EquationsService } from 'src/admin/equations/equations.service';
 import { AuditService } from 'src/admin/audit/audit.service';
 import { StatisticsService } from './statistics.service';
+import { HypsometricService } from './hypsometric.service';
 import type { User } from 'src/generated/prisma/client';
 import {
   AuditAction,
@@ -63,6 +64,7 @@ export class ProcessingService {
     private readonly equationsService: EquationsService,
     private readonly statisticsService: StatisticsService,
     private readonly auditService: AuditService,
+    private readonly hypsometricService: HypsometricService,
   ) {}
 
   /**
@@ -361,6 +363,73 @@ export class ProcessingService {
     const subPlotsResults: SubPlotProcessingResult[] = [];
     const allProcessedTrees: TreeProcessingResult[] = [];
     const plots: PlotProcessingResult[] = [];
+
+    // Ajuste hipsométrico por talhão
+    const hypsometricModels = new Map<string, { a: number; b: number }>();
+
+    const plotTreeGroups = new Map<
+      string,
+      Array<{ diameterDapCm: number; height: number | null }>
+    >();
+
+    for (const subPlot of subPlotsInput) {
+      const groupKey = subPlot.plotId ?? subPlot.plotName ?? contextInput.plotName;
+
+      const group = plotTreeGroups.get(groupKey) ?? [];
+
+      group.push(
+        ...subPlot.trees.map((tree) => ({
+          diameterDapCm: tree.diameterDapCm,
+          height: tree.heightM ?? null,
+        })),
+      );
+
+      plotTreeGroups.set(groupKey, group);
+    }
+
+    for (const [groupKey, trees] of plotTreeGroups) {
+      try {
+        const model = this.hypsometricService.fitNaslundModel(trees);
+        hypsometricModels.set(groupKey, model);
+      } catch {
+        // Não ajusta o modelo quando não existem observações suficientes
+        // ou quando os dados não permitem o ajuste.
+      }
+    }
+
+    // Aplicação das alturas estimadas
+    for (const subPlot of subPlotsInput) {
+      const groupKey = subPlot.plotId ?? subPlot.plotName ?? contextInput.plotName;
+      const model = hypsometricModels.get(groupKey);
+
+      if (!model) {
+        continue;
+      }
+
+      for (const tree of subPlot.trees) {
+        if (tree.heightM != null) {
+          continue;
+        }
+
+        try {
+          tree.heightM = this.hypsometricService.estimateHeight(
+            tree.diameterDapCm,
+            model.a,
+            model.b,
+          );
+
+          tree.observations = [
+            tree.observations,
+            'Altura estimada pelo modelo hipsométrico de Näslund.',
+          ]
+            .filter(Boolean)
+            .join(' ');
+        } catch {
+          // Mantém a árvore sem altura caso a estimativa não seja válida.
+        }
+      }
+    }
+
     // Etapas: Árvore -> Validação -> Volume -> Parcela
     for (const subPlot of subPlotsInput) {
       const areaM2 = subPlot.areaM2 || dto.defaultParcelaAreaM2;
