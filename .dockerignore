@@ -1,0 +1,78 @@
+# Git
+.git
+.github
+.gitignore
+.gitmodules
+
+# Dependencies
+node_modules
+**/node_modules
+
+# Compiled output
+dist
+build
+*.tsbuildinfo
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tests
+test
+tests
+**/*.spec.ts
+**/*.test.ts
+**/*.e2e-spec.ts
+coverage
+.nyc_output
+
+# IDEs and editors
+.idea
+.vscode
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.*
+.env-example
+
+# Temporary files and cache
+.temp
+.tmp
+.cache
+.eslintcache
+
+# Docker
+Dockerfile*
+docker-compose*
+compose*.yaml
+compose*.yml
+.dockerignore
+
+# Git hooks and release
+.husky
+.releaserc.json
+commitlint.config.mjs
+
+# Formatting and linting
+.prettierrc
+.prettierignore
+eslint.config.mjs
+
+# Documentation
+*.md
+
+# AI development tools
+skills-lock.json
+
+# Prisma generated client
+src/generated/prisma
