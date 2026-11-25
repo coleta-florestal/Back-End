@@ -35,7 +35,7 @@ export class HypsometricService {
 
     const denominator = n * sumX2 - sumX ** 2;
 
-    if (denominator === 0) {
+    if (!Number.isFinite(denominator) || denominator === 0) {
       throw new BadRequestException(
         'Não foi possível ajustar o modelo hipsométrico com os dados fornecidos.',
       );
@@ -44,9 +44,12 @@ export class HypsometricService {
     const b = (n * sumXY - sumX * sumY) / denominator;
     const a = (sumY - b * sumX) / n;
 
+    if (!Number.isFinite(a) || !Number.isFinite(b)) {
+      throw new BadRequestException('Os coeficientes do modelo hipsométrico são inválidos.');
+    }
+
     return { a, b };
   }
-
   estimateHeight(diameterDapCm: number, a: number, b: number) {
     const denominator = a + b * diameterDapCm;
 

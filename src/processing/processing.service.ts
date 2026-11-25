@@ -44,6 +44,7 @@ interface PipelineSubPlotInput {
     name?: string;
     diameterDapCm: number;
     heightM?: number | null;
+    heightSource?: 'MEASURED' | 'ESTIMATED' | 'MISSING';
     quality?: TreeQuality;
     observations?: string;
   }>;
@@ -364,6 +365,13 @@ export class ProcessingService {
     const allProcessedTrees: TreeProcessingResult[] = [];
     const plots: PlotProcessingResult[] = [];
 
+    // Identificação da origem das alturas
+    for (const subPlot of subPlotsInput) {
+      for (const tree of subPlot.trees) {
+        tree.heightSource = tree.heightM != null ? 'MEASURED' : 'MISSING';
+      }
+    }
+
     // Ajuste hipsométrico por talhão
     const hypsometricModels = new Map<string, { a: number; b: number }>();
 
@@ -387,13 +395,15 @@ export class ProcessingService {
       plotTreeGroups.set(groupKey, group);
     }
 
-    for (const [groupKey, trees] of plotTreeGroups) {
-      try {
-        const model = this.hypsometricService.fitNaslundModel(trees);
-        hypsometricModels.set(groupKey, model);
-      } catch {
-        // Não ajusta o modelo quando não existem observações suficientes
-        // ou quando os dados não permitem o ajuste.
+    if (equation.modelType !== EquationType.HUSCH) {
+      for (const [groupKey, trees] of plotTreeGroups) {
+        try {
+          const model = this.hypsometricService.fitNaslundModel(trees);
+          hypsometricModels.set(groupKey, model);
+        } catch {
+          // Não ajusta o modelo quando não existem observações suficientes
+          // ou quando os dados não permitem o ajuste.
+        }
       }
     }
 
@@ -417,6 +427,8 @@ export class ProcessingService {
             model.a,
             model.b,
           );
+
+          tree.heightSource = 'ESTIMATED';
 
           tree.observations = [
             tree.observations,
@@ -526,6 +538,7 @@ export class ProcessingService {
           name: tree.name,
           diameterDapCm: tree.diameterDapCm,
           heightM: tree.heightM ?? null,
+          heightSource: tree.heightSource ?? 'MISSING',
           quality: tree.quality || TreeQuality.NORMAL,
           volumeM3,
           basalAreaM2,
