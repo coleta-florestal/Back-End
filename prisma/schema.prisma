@@ -4,9 +4,10 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
-  moduleFormat = "cjs"
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "cjs"
+  importFileExtension = "js"
 }
 
 datasource db {
@@ -16,18 +17,238 @@ datasource db {
 enum Role {
   USER
   ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  COMPLETE
+  REOPEN
+  APPROVE
+  REJECT
+}
+
+enum AuditEntity {
+  USER
+  FARM
+  PLOT
+  SUBPLOT
+  TREE
+  EQUATION
+  VALIDATION_SETTINGS
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  tokenHash String    @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  role      Role     @default(USER)
+  id            String        @id @default(uuid())
+  email         String        @unique
+  role          Role          @default(USER)
+  name          String
+  password      String
 
-  name  String
-  password  String
+  passwordResetTokens PasswordResetToken[]
+
+  farms Farm[]
+  auditLogs AuditLog[]
+  farmAccesses UserFarm[] @relation("UserFarmAccess")
+
+  accountStatus AccountStatus @default(ACTIVE) @map("account_status")
+  status UserStatus @default(PENDING)
+
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Farm {
+  id String @id @default(uuid())
+  name String
+  address String?
+
+  description String?
+  
+  ownerId String @map("owner_id") 
+  owner User @relation(fields: [ownerId], references: [id])
+  userAccesses UserFarm[] @relation("UserFarmAccess")
+
+  plots Plot[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@map("users")
+  @@map("farms")
+}
+
+enum PlotStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  FINISHED
+}
+
+model Plot {
+  id String @id @default(uuid())
+  name String 
+  areaHa Float @map("area_ha")
+  description String?
+
+  status PlotStatus @default(NOT_STARTED)
+
+  farmId String @map("farm_id")
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  subPlots SubPlot[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("plots")
+}
+
+enum SubPlotStatus {
+  OPEN
+  COMPLETED
+}
+
+model SubPlot {
+  id          String @id @default(uuid())
+  name      String
+  areaM2      Float? @map("area_m2")
+  targetTrees Int    @map("target_trees")
+
+  status     SubPlotStatus @default(OPEN)
+
+  plotId String @map("plot_id")
+  plot   Plot   @relation(fields: [plotId], references: [id], onDelete: Cascade)
+
+  trees Tree[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("subplots")
+}
+
+enum TreeQuality {
+  NORMAL
+  BIFURCADA_ACIMA_DE_1_3M
+  BIFURCADA_ABAIXO_DE_1_3M
+  INCLINADA
+  MORTA
+  FALHA
+  PROBLEMAS_FITOSSANITARIOS
+  QUEBRADA
+  OUTRO
+}
+
+model Tree {
+  id            String      @id @default(uuid())
+  name        String
+  diameterDapCm Float       @map("diameter_dap_cm")
+  height        Float?
+  quality       TreeQuality @default(NORMAL)
+  observations  String?
+
+  subPlotId String  @map("sub_plot_id")
+  subPlot   SubPlot @relation(fields: [subPlotId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("trees")
+}
+
+enum EquationType {
+  SCHUMACHER_HALL
+  SPURR
+  HUSCH
+}
+
+model VolumetricEquation {
+  id String @id @default(uuid())
+
+  name String
+  modelType EquationType @map("model_type")
+
+  beta0 Float
+  beta1 Float
+  beta2 Float?
+
+  r2        Float?
+  syx       Float?
+
+  isActive Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("volumetric_equations")
+}
+
+
+model ValidationSettings {
+  id         Int   @id @default(1)
+  minDapCm   Float @map("min_dap_cm")
+  maxDapCm   Float @map("max_dap_cm")
+  minHeightM Float @map("min_height_m")
+  maxHeightM Float @map("max_height_m")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("validation_settings")
+}
+
+model AuditLog {
+  id        String      @id @default(uuid())
+  action    AuditAction
+  entity    AuditEntity
+  userId    String?     @map("user_id")
+  metadata  Json?
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model UserFarm {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  farmId    String   @map("farm_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation("UserFarmAccess", fields: [userId], references: [id], onDelete: Cascade)
+  farm Farm @relation("UserFarmAccess", fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, farmId])
+  @@index([farmId])
+  @@map("user_farms")
 }

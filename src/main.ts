@@ -4,6 +4,14 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.enableCors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
+    credentials: true,
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -11,6 +19,11 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+
   await app.listen(process.env.PORT ?? 3333);
 }
-bootstrap();
+
+bootstrap().catch((error) => {
+  console.error('Error during application bootstrap:', error);
+  process.exit(1);
+});

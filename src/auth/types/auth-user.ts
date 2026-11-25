@@ -3,7 +3,7 @@ import { Role } from 'src/generated/prisma/enums';
 
 export interface AuthRequest extends Request {
   user?: {
-    id: number;
+    id: string;
     email: string;
     role: Role;
   };

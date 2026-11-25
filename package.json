@@ -1,6 +1,6 @@
 {
   "name": "coleta-back",
-  "version": "1.0.0",
+  "version": "1.0.0-rc.12",
   "description": "",
   "author": "",
   "private": true,
@@ -11,7 +11,9 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/src/main.js",
+    "db:deploy": "prisma migrate deploy",
+    "postinstall": "prisma generate",
     "lint": "eslint .",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -25,6 +27,7 @@
     "@nestjs/config": "^12.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "^12.0.3",
+    "@nestjs/mapped-types": "^12.0.1",
     "@nestjs/passport": "^12.0.0",
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/adapter-pg": "^7.10.0",
@@ -32,6 +35,7 @@
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
+    "nodemailer": "^10.6.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.23.0",
@@ -52,6 +56,7 @@
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.0",
+    "@types/nodemailer": "^8.0.2",
     "@types/passport-jwt": "^4.0.1",
     "@types/pg": "^8.23.1",
     "@types/supertest": "^7.0.0",
@@ -90,10 +95,27 @@
       "ts"
     ],
     "rootDir": "src",
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1",
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    },
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+\\.(t|j)s$": [
+        "ts-jest",
+        {
+          "tsconfig": {
+            "allowJs": true,
+            "module": "commonjs",
+            "moduleResolution": "node",
+            "resolvePackageJsonExports": false
+          }
+        }
+      ]
     },
+    "transformIgnorePatterns": [
+      "node_modules/(?!@nestjs/(config|jwt|passport)/)"
+    ],
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],

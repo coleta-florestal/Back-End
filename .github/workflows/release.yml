@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - stage
 
 permissions:
   contents: write
@@ -21,7 +22,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_TOKEN }}
-          persist-credencial: true
+          persist-credentials: true
           
       - name: Set up node
         uses: actions/setup-node@v6

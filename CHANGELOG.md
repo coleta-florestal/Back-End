@@ -1,18 +1,175 @@
-# 1.0.0 (2026-10-27)
+# [1.0.0-rc.12](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.11...v1.0.0-rc.12) (2026-11-25)
 
 ### Bug Fixes
 
+- docker file modifications ([f653f1f](https://github.com/coleta-florestal/Back-End/commit/f653f1fb0836e6d48efb83442a50119304e6f6d4))
+
+# [1.0.0-rc.11](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.10...v1.0.0-rc.11) (2026-11-23)
+
+### Features
+
+- **profile:** adiciona GET /profile com o usuário atual ([f43e1f0](https://github.com/coleta-florestal/Back-End/commit/f43e1f0b9467a4fd6cf5ccf625d8ecc7dcd24308))
+
+# [1.0.0-rc.10](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.9...v1.0.0-rc.10) (2026-11-21)
+
+### Bug Fixes
+
+- **trees:** enforce validation limits and plot/subplot status checks ([1e02831](https://github.com/coleta-florestal/Back-End/commit/1e02831d944a0ffa65deed4826da063678c2b84d))
+
+# [1.0.0-rc.9](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.8...v1.0.0-rc.9) (2026-11-21)
+
+### Bug Fixes
+
+- **processing:** enforce subplot completion rules and finalize plot ([0f69ee5](https://github.com/coleta-florestal/Back-End/commit/0f69ee51ac52a486da58e38516fa4ddcd3fa72d2))
+
+# [1.0.0-rc.8](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.7...v1.0.0-rc.8) (2026-11-21)
+
+### Bug Fixes
+
+- **auth:** block inactive users, omit password on signup and hash password on profile update ([4fecc03](https://github.com/coleta-florestal/Back-End/commit/4fecc03b262a867a626c64fa4c8267be51ee0e1a))
+- **farm:** prevent duplicate farm and plot names and validate positive plot area ([5d430f5](https://github.com/coleta-florestal/Back-End/commit/5d430f501035b87108e0bea6920338e64d851f92))
+- **subplots:** block update and deletion of completed or non-empty subplots ([8c618c7](https://github.com/coleta-florestal/Back-End/commit/8c618c7e960d9c72dd22b2b14f7aa717e9d3ffd5))
+- **users:** block self or last admin deactivation and translate messages ([c11efeb](https://github.com/coleta-florestal/Back-End/commit/c11efebb3c836c822c02660415be12f2a618c6fd))
+
+# [1.0.0-rc.7](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.6...v1.0.0-rc.7) (2026-11-21)
+
+### Bug Fixes
+
+- **auth:** fix auth ([cfc03f0](https://github.com/coleta-florestal/Back-End/commit/cfc03f051540ff95fca3b217c9d0eaa5791c0341))
+- **auth:** modify return in sign up methdo ([bdaa500](https://github.com/coleta-florestal/Back-End/commit/bdaa5006b45af39b523dd12459330722150d335c))
+- **profile:** add hashing to update profile password ([63fd31f](https://github.com/coleta-florestal/Back-End/commit/63fd31fdcac8e5db42fb112096d8a8565a82400b))
+
+# [1.0.0-rc.6](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.5...v1.0.0-rc.6) (2026-11-20)
+
+### Features
+
+- **auth:** change authentication timing ([47c0cc2](https://github.com/coleta-florestal/Back-End/commit/47c0cc201311e3ee008d18e8a048f6598a2bce48))
+- **auth:** create forgot password method and route ([501dbf3](https://github.com/coleta-florestal/Back-End/commit/501dbf3bac961641a234a2132aeb2a760582d6b5))
+- **auth:** create reset password dto ([039bd0c](https://github.com/coleta-florestal/Back-End/commit/039bd0cf5be94acc8843ee10e3181191351927e5))
+- **auth:** create reset password methdo and route ([48266d9](https://github.com/coleta-florestal/Back-End/commit/48266d9ea3c2a5a7695c9fb8530fbabd44f6ec5a))
+- **auth:** define in signup the pending status in user ([bb55ecb](https://github.com/coleta-florestal/Back-End/commit/bb55ecb286bea167711dc3c50c9e281b7e69fca5))
+- **auth:** sign in now verifies if user is pending or not ([bf9d9d1](https://github.com/coleta-florestal/Back-End/commit/bf9d9d13ab741dd38fcfe93a381d58537f6107ec))
+- **auth:** signup does not return token anymore ([7418b66](https://github.com/coleta-florestal/Back-End/commit/7418b6687dc59191bb8d4bf5635cd9932af91253))
+- **email:** create email module ([e6f002a](https://github.com/coleta-florestal/Back-End/commit/e6f002a2818dc660f0aa95df58b66cfb4767502c))
+- **email:** create email transporter method ([638a9d1](https://github.com/coleta-florestal/Back-End/commit/638a9d146a5a27aa7ee04a3a869ec42013e15d2b))
+- **email:** create helper method ([42c5370](https://github.com/coleta-florestal/Back-End/commit/42c5370c76083a62634ba5f883ae1ec8fd47f32e))
+- **email:** create send email dto ([c3f62cb](https://github.com/coleta-florestal/Back-End/commit/c3f62cb45c829e328e2599e9d678006c23fb6f7b))
+- **email:** create send password reset method ([6c29cf3](https://github.com/coleta-florestal/Back-End/commit/6c29cf3f70d1fba06f7a7ae6b636c34124d9b895))
+- **email:** final email service usage ([ea29e91](https://github.com/coleta-florestal/Back-End/commit/ea29e911469de08966b91f33f89750daeed9b9b5))
+- **env:** add new env variables ([cd38722](https://github.com/coleta-florestal/Back-End/commit/cd38722f5085c3f303ed86c01a14b4603397ac25))
+- integrei o perfil do usuario ([7454e70](https://github.com/coleta-florestal/Back-End/commit/7454e70a3930ecceb54f6786b9c3efee0b32a447))
+- **prisma:** add password reset token to prisma migrations ([1ffacd5](https://github.com/coleta-florestal/Back-End/commit/1ffacd59c62f016695c0cb68434ecc23d3592732))
+- **profile:** add password to dto params ([d018e24](https://github.com/coleta-florestal/Back-End/commit/d018e24dffe00437cca2ff061d930e38162b871d))
+- **profile:** modify the way dto is passed in method ([79b2a06](https://github.com/coleta-florestal/Back-End/commit/79b2a06dc1e6067d2be0eaf2ddbf988369bfd495))
+
+# [1.0.0-rc.5](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.4...v1.0.0-rc.5) (2026-11-18)
+
+### Bug Fixes
+
+- **projects:** fix user auth to farms ([efe1399](https://github.com/coleta-florestal/Back-End/commit/efe139921caa574681494d185ab61d833dcdce56))
+
+### Features
+
+- **adudit:** add audit schema ([7ebefec](https://github.com/coleta-florestal/Back-End/commit/7ebefec3e7fc24941a0170b8d67487afea4d9188))
+- **audit:** add audit controller with routes and role restrictions ([4cb9e63](https://github.com/coleta-florestal/Back-End/commit/4cb9e63b2412aa6beb538d18574242ce129614e9))
+- **audit:** add audit service with findall and create methods ([03c0971](https://github.com/coleta-florestal/Back-End/commit/03c097135acbb8c79cfb1386296c3d29474917c9))
+- **audit:** add audit to equations module ([94f3f0a](https://github.com/coleta-florestal/Back-End/commit/94f3f0a439afea5d653cfc434cd2c131789c1d02))
+- **audit:** add audit to farms module ([72be310](https://github.com/coleta-florestal/Back-End/commit/72be31021d455a8b475edef542b5fbc94a8561d6))
+- **audit:** add audit to plots module ([deb49e4](https://github.com/coleta-florestal/Back-End/commit/deb49e45e3b741707959232674b4a6d74a87c660))
+- **audit:** add audit to subplots module ([af9bfe3](https://github.com/coleta-florestal/Back-End/commit/af9bfe3d1401249042c53e0412d471fe6b5234b7))
+- **audit:** add audit to trees module ([6a2cf2f](https://github.com/coleta-florestal/Back-End/commit/6a2cf2f92f14f9c01213481738cf119c87854029))
+- **audit:** add audit to user module ([7993505](https://github.com/coleta-florestal/Back-End/commit/7993505c13df0df49f7e15dd86562ef7f8d84b35))
+- **audit:** add audit to validations module ([bad5645](https://github.com/coleta-florestal/Back-End/commit/bad56455df25a27d6c3c1bc81152e758333dc923))
+- **audit:** add exports service in audit module ([2eb0d7d](https://github.com/coleta-florestal/Back-End/commit/2eb0d7d47f4c5b88d506c02ada02a00290270bd3))
+- **projects:** add projects modules ([f3ef264](https://github.com/coleta-florestal/Back-End/commit/f3ef26447845c8a2499f91516af4b94bdd224ac5))
+- **projects:** add user and farm relation on schema ([2db5f88](https://github.com/coleta-florestal/Back-End/commit/2db5f88cc2ef94f48151404a3ae58a25a4ece51d))
+- **projects:** export user service to use in projects ([37c8ba6](https://github.com/coleta-florestal/Back-End/commit/37c8ba6afb957310d59e1e9c182607feba5e26c0))
+- **projects:** import farms and user module ([2532424](https://github.com/coleta-florestal/Back-End/commit/2532424d5308749a7c00e4ccf6960d60c9f9c164))
+- **results:** add results processing to farms ([e431889](https://github.com/coleta-florestal/Back-End/commit/e43188905a956ce5589ccdca0d0301d1897078c7))
+
+# [1.0.0-rc.4](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.3...v1.0.0-rc.4) (2026-11-11)
+
+### Bug Fixes
+
+- **migration:** map old TreeQuality values before enum cast ([86258ea](https://github.com/coleta-florestal/Back-End/commit/86258ea04227d76a5db3bc513ef0f16f77a1d5e8))
+
+# [1.0.0-rc.3](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2026-11-11)
+
+### Bug Fixes
+
+- **all:** lint ([fb93ee0](https://github.com/coleta-florestal/Back-End/commit/fb93ee014bd1bfd2b6076571d4fc73f34c4473f4))
+- **dashboard:** ajusta métodos do service de dashboard ([c292260](https://github.com/coleta-florestal/Back-End/commit/c292260d2a3dae1c259f96e04c653334770fc5b5))
+- **dashboard:** fix dashboard controller imports ([259c31e](https://github.com/coleta-florestal/Back-End/commit/259c31e24451bc78277c2856c6d32c8cceed5b69))
+- **dashboards:** fix service dashboard methods ([5f0ea65](https://github.com/coleta-florestal/Back-End/commit/5f0ea65064583199cab7032eb81572ad08d31bc3))
+- **processing:** restringe acesso, valida entradas e usa apenas dados validos ([336bfe7](https://github.com/coleta-florestal/Back-End/commit/336bfe726c7dbf3056457c19d4fadb2258228108))
+
+### Features
+
+- **dashboard:** add dashboard controller methods ([68cb9a5](https://github.com/coleta-florestal/Back-End/commit/68cb9a596f77d7b15bb4822a918e8c3321d6952e))
+- **dashboard:** add dashboard service method ([087b6e5](https://github.com/coleta-florestal/Back-End/commit/087b6e5019653babc21c66ef643570facd517928))
+- **farm:** add user validation when creating farm ([3333720](https://github.com/coleta-florestal/Back-End/commit/33337207c5e19f5137f909bebdadc3c8b38f9437))
+- **processing:** adiciona tipos e DTOs para pipeline de processamento ([07d1b73](https://github.com/coleta-florestal/Back-End/commit/07d1b73d19cd2a5394dba0b522c137043bd41d18))
+- **processing:** implementa ProcessingController e registra ProcessingModule ([ffaf90e](https://github.com/coleta-florestal/Back-End/commit/ffaf90ec99edfd82ad03588df902e3418da72e5e))
+- **processing:** implementa ProcessingService para orquestracao do fluxo de inventario ([259d706](https://github.com/coleta-florestal/Back-End/commit/259d706490471fd45fd2037a1f1fa81317d7be21))
+- **processing:** implementa StatisticsService para calculos descritivos e amostragem ([f8cb170](https://github.com/coleta-florestal/Back-End/commit/f8cb1700e636084ab569cf88835d7392dff7e4f7))
+- **validations:** adiciona modelo de limites ([49e3e91](https://github.com/coleta-florestal/Back-End/commit/49e3e910e73eacdd5e17c642d41ad8a78b82f50c))
+- **validations:** adiciona rotas administrativas ([86805c2](https://github.com/coleta-florestal/Back-End/commit/86805c269f2310045a9f89c1b594a9dfee08dbcb))
+- **validations:** implementa regras dos limites ([9387442](https://github.com/coleta-florestal/Back-End/commit/938744234a5d7e2fdd8f8d56caf65fa7605b63be))
+
+# [1.0.0-rc.2](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2026-11-05)
+
+### Features
+
+- **plot:** add new role requirement create, update and delete plots ([19dc692](https://github.com/coleta-florestal/Back-End/commit/19dc6925145b4abd2ccf8f41a8bb0f63ab61fa6c))
+- **plot:** create plot dto ([4fc908c](https://github.com/coleta-florestal/Back-End/commit/4fc908c86c4f26c559ccd03c7a312b473b705d6b))
+- **plot:** create update method and endpoint ([b3121a8](https://github.com/coleta-florestal/Back-End/commit/b3121a8d05d80e34a6a6fcdf8f7a80efd32371f0))
+- **subplot:** create update subplot method and endpoint ([c10113d](https://github.com/coleta-florestal/Back-End/commit/c10113d0465344f00b296eb38adc9287d818501e))
+- **subplots:** create update subplot dto ([7f13c40](https://github.com/coleta-florestal/Back-End/commit/7f13c40941bd90933a86f8b469c435f038830285))
+- **tree:** add validation of subplot status in create and delete methods ([01659ed](https://github.com/coleta-florestal/Back-End/commit/01659edf1e96b3b61c8f48001b6e56f68ebc8293))
+- **trees:** add validation to only update trees if the subplot is open ([12f0456](https://github.com/coleta-florestal/Back-End/commit/12f0456c313df14d02e46ff4fd36227950b3cec6))
+
+# 1.0.0-rc.1 (2026-11-04)
+
+### Bug Fixes
+
+- **admin:** remove equation module import from app module ([a26093c](https://github.com/coleta-florestal/Back-End/commit/a26093cba8e01db5d37bab68cd63c59e21f481a3))
 - **auth:** change params in payload dto ([ec8324a](https://github.com/coleta-florestal/Back-End/commit/ec8324a5c2518317c0377ea819647f1d30688da8))
+- **farm:** fix farm id param ([3e7a08a](https://github.com/coleta-florestal/Back-End/commit/3e7a08a5903feb603a787b864565028b4cafc6bc))
 - fix dto attribute initialization ([80b87a0](https://github.com/coleta-florestal/Back-End/commit/80b87a0a654bb5e7dffaf40e6ac9877e15173470))
+- **main:** fix the preetier requirement in main ([5053606](https://github.com/coleta-florestal/Back-End/commit/50536065374a18c08dc2e0a292268b8b5c4bccf9))
+- modify main build file path ([1a78882](https://github.com/coleta-florestal/Back-End/commit/1a788823b1f8d9b733aa00e6cd3fe06c46d0485b))
+- **plots:** add new validation in findplot helper method' ([fa3309b](https://github.com/coleta-florestal/Back-End/commit/fa3309bcaa6f6f3dbd94ac1e6e7d660aca1cb13d))
+- **plots:** changes dto validation and change output from findall ([344a876](https://github.com/coleta-florestal/Back-End/commit/344a8766fadaf2c2f37498b0183d2e268bf6e0a4))
+- **prisma:** solve prisma conflict ([3fea8ff](https://github.com/coleta-florestal/Back-End/commit/3fea8ff63c5795ec4cda92cebe1f2986c2375d13))
+- remove autoimport ([a891527](https://github.com/coleta-florestal/Back-End/commit/a891527b5dc8233c0b8eb2d03eb23cd0ee4ab71e))
 - repair merge of root refactor with husky setup ([143033b](https://github.com/coleta-florestal/Back-End/commit/143033b967007570fa3970ba7ff297e74216ba14))
-- update github token ([7c788f1](https://github.com/coleta-florestal/Back-End/commit/7c788f10f3d88747f69f016ecb35ddf2d5aaf914))
+- **subplot:** add subplot id to update status endpoint ([8bd90cc](https://github.com/coleta-florestal/Back-End/commit/8bd90cc0df7e716e3a40e5b31c06a7a26adb17d0))
+- **subplot:** fix subplot endpoint and modify methdo return ([565d9c3](https://github.com/coleta-florestal/Back-End/commit/565d9c30725bac4e1d7fe7a65c144a4e4a2fffdf))
+- **subplots:** change endpoints and clean up some methods in subplots ([3aa7869](https://github.com/coleta-florestal/Back-End/commit/3aa78690ce5ab79b4bc5d9697e996b03b3b15039))
+- **trees:** change delete method return ([560458a](https://github.com/coleta-florestal/Back-End/commit/560458a9cbd11b3a49a01238c7b3aed4c08c614d))
 - update github token ([49074d5](https://github.com/coleta-florestal/Back-End/commit/49074d505e2aa34f693751bb84b3fcd77c5c88f9))
+- **user:** remove user module import ([4814db8](https://github.com/coleta-florestal/Back-End/commit/4814db838885f0329fb7c099eab23faba72957d5))
 
 ### Features
 
 - add ci workflow ([a83865c](https://github.com/coleta-florestal/Back-End/commit/a83865c65217d29589c675db28f657dedb2a0ee3))
 - add password costumized restriction to dto ([8da72f0](https://github.com/coleta-florestal/Back-End/commit/8da72f098f8cf24a5cd2b85bb6f5495a789a36c6))
 - add secrets check ([7186d93](https://github.com/coleta-florestal/Back-End/commit/7186d9345c7bd1fc2e33765e5d989c7cffbe6f5a))
+- **admin:** add activate/deactivate methods and search by name or email ([dd78fdf](https://github.com/coleta-florestal/Back-End/commit/dd78fdfb3002d49d773ba5241b4f44fba9a1f5b4))
+- **admin:** add approveDto and user service methods ([09a3a47](https://github.com/coleta-florestal/Back-End/commit/09a3a47e179f5ece560356754ac505f51a86d4e5))
+- **admin:** add dto update user ([ff2f602](https://github.com/coleta-florestal/Back-End/commit/ff2f60204a23ae09607dec9a858dd137f0fce154))
+- **admin:** add enum status ([1cf2607](https://github.com/coleta-florestal/Back-End/commit/1cf260717c22eeb911b90769d6d2325b7497cd70))
+- **admin:** add enum UserStatus ([2c4cd2a](https://github.com/coleta-florestal/Back-End/commit/2c4cd2a5630890f1277edd4cd0ea88d86ecab952))
+- **admin:** add find by email or name method ([1d47921](https://github.com/coleta-florestal/Back-End/commit/1d4792157498e0a5e93afc3e97154d7e38c5e74c))
+- **admin:** add route on controller ([a4e2c65](https://github.com/coleta-florestal/Back-End/commit/a4e2c65ec5bd4a140a209848d39a9e75c776d410))
+- **admin:** add user controller modifiers ([bfb4635](https://github.com/coleta-florestal/Back-End/commit/bfb463572b049799dc9931fbaf6c3243ffeb2750))
+- **admin:** add users CRUD ([a728e75](https://github.com/coleta-florestal/Back-End/commit/a728e758738bf4af95eead6da439ba1a0b26f134))
+- **admin:** create admin module structure ([9e2fb5f](https://github.com/coleta-florestal/Back-End/commit/9e2fb5ff0e6759463bcd2afb2fdf3264332396bf))
+- **admin:** create audit module ([4bf56d2](https://github.com/coleta-florestal/Back-End/commit/4bf56d200661655ab5b267c9544c7cb27ffbe273))
+- **admin:** create projects module ([94ff2dd](https://github.com/coleta-florestal/Back-End/commit/94ff2ddfd006de390c73504e8508d9dd62f4e662))
+- **admin:** create users module ([a89431a](https://github.com/coleta-florestal/Back-End/commit/a89431a3e89fb1582134a192a75d8189b0f27a0c))
+- **admin:** fix general things ([dc91c2f](https://github.com/coleta-florestal/Back-End/commit/dc91c2ff4a96a0807c9b59f4d9f66347dc2ae17f))
+- **admin:** integrate dev into equations feature ([ee31f43](https://github.com/coleta-florestal/Back-End/commit/ee31f43c2a6c20961905e1bc9774142aba6d65a2))
 - **auth:** add bcrypt to hash password ([759ee98](https://github.com/coleta-florestal/Back-End/commit/759ee98c2f78b7c0816c0698b7e2e46ac86665ac))
 - **auth:** compare password dto to hashed password ([646ffa2](https://github.com/coleta-florestal/Back-End/commit/646ffa2dfe2aad1d290c55a7f9b7afed3cf3b762))
 - **auth:** configurate jwt options globally ([87dfcd9](https://github.com/coleta-florestal/Back-End/commit/87dfcd985a641eb7124626fa682ffd5db2abe976))
@@ -28,7 +185,59 @@
 - create user method ([e9af01c](https://github.com/coleta-florestal/Back-End/commit/e9af01cb086c2134bda6358dc74d7eb9034ebfdc))
 - create user model and role enum migration ([fd6e2d1](https://github.com/coleta-florestal/Back-End/commit/fd6e2d1ecd4196b516bc013e993eae259cbd9bad))
 - create user module ([822c8ce](https://github.com/coleta-florestal/Back-End/commit/822c8ce651c32b741c6c1b673455609e504e2c36))
+- **equations:** add equations coeficients ([e696bdc](https://github.com/coleta-florestal/Back-End/commit/e696bdccd2886bb4d0edd0c025f771d9446b180f))
+- **equations:** add equations controller routes ([dc479f8](https://github.com/coleta-florestal/Back-End/commit/dc479f85a35f44a2f9b17a51c11229178b78fb9e))
+- **equations:** add equations dtos ([ed4564b](https://github.com/coleta-florestal/Back-End/commit/ed4564bc6c3838429c257f295b4811daac89b43a))
+- **equations:** add equations service with methods ([dfecd8d](https://github.com/coleta-florestal/Back-End/commit/dfecd8db1aa45109aaea6de37bb9977fbf659c81))
+- **equations:** add volumetric equation schema and migration ([884734e](https://github.com/coleta-florestal/Back-End/commit/884734ed1953b074bf18f376371224c2ddc3ee22))
+- **equations:** adjusting tree metrics ([67c2190](https://github.com/coleta-florestal/Back-End/commit/67c219069a85edfd278f0ed629cacad3b30867fb))
+- **equations:** create equations module ([b7d88b4](https://github.com/coleta-florestal/Back-End/commit/b7d88b441d9b48f5cd452e6d75d8f924cf3f9d6d))
+- **equations:** fix structure and parameters on service ([1fe7b2c](https://github.com/coleta-florestal/Back-End/commit/1fe7b2c36f90b304bab524e72f3fb031cacdedf8))
+- **equations:** fix tree structure ([37e6d63](https://github.com/coleta-florestal/Back-End/commit/37e6d63e35b63e157decb0067dbbbe539022c0f8))
+- **farm:** add parse uuid pipe in id params ([88d9e3c](https://github.com/coleta-florestal/Back-End/commit/88d9e3c94843c593b335a1e8d3d62f633b6786ae))
+- **farm:** create endpoint and method for find farms ([42787a5](https://github.com/coleta-florestal/Back-End/commit/42787a5f928d6d6156b1e694decf842bb85b9d48))
+- **farm:** create farm dto ([34e7de2](https://github.com/coleta-florestal/Back-End/commit/34e7de22a96fa89d3bc565991344679cc85089c8))
+- **farm:** create farm module ([62904e5](https://github.com/coleta-florestal/Back-End/commit/62904e5c7d498b8042125714879e21d6f5b22adc))
+- **farm:** create farms module ([874be54](https://github.com/coleta-florestal/Back-End/commit/874be54b97811317e49767c812c075066e5579bc))
+- **farm:** create plots module ([fb76ccf](https://github.com/coleta-florestal/Back-End/commit/fb76ccfa4302c5e28c04977e26620476db455121))
+- **farm:** create subplots module ([6524a72](https://github.com/coleta-florestal/Back-End/commit/6524a72e4ee1d1717b44a191bde615069a9526a5))
+- **farm:** create trees module ([7d3c906](https://github.com/coleta-florestal/Back-End/commit/7d3c906c8e8e4730bc07a1cb142b53c5036baa04))
+- **farm:** fix roles in create farm endpoint ([df263c3](https://github.com/coleta-florestal/Back-End/commit/df263c3e607cab62360dcdb3da5dd806ad120a62))
+- **farms:** add create farm method and endpoint ([7e1d892](https://github.com/coleta-florestal/Back-End/commit/7e1d89213f44b3a7936d9d9eb2a9d5a8b5603a83))
+- **farms:** add delete method and requires auth ([911bde8](https://github.com/coleta-florestal/Back-End/commit/911bde8d8b00627ea6035cd4291f8b6edc367403))
+- **farms:** add find admin endpoint ([5674c00](https://github.com/coleta-florestal/Back-End/commit/5674c00cebe25d36c6b1da41a5f910f4278abe1b))
+- **farms:** create update farms method ([4740ed7](https://github.com/coleta-florestal/Back-End/commit/4740ed79828c773da78fc6689a2b617d51c6920b))
+- **farm:** unify farm module into one ([b62ff1c](https://github.com/coleta-florestal/Back-End/commit/b62ff1cdc675f2da6eea12b36aec58b28334bdfb))
+- **plot:** create new method to delete plots ([8d813ea](https://github.com/coleta-florestal/Back-End/commit/8d813ea6b87c298e67d64ba53e835faca3c91d84))
+- **plots:** add create plots dto ([62fa896](https://github.com/coleta-florestal/Back-End/commit/62fa896b1e5f52a51b2e091e85cd332d175bb3ec))
+- **plots:** add create plots method and endpoints ([347e48f](https://github.com/coleta-florestal/Back-End/commit/347e48f917ae367647d87b273e04ec444a03a090))
+- **plots:** change endpoints ([bb9d931](https://github.com/coleta-florestal/Back-End/commit/bb9d93183c81da583db3a66289bdfd90e40d6212))
+- **plots:** change validation and data in create plots method ([d2933e8](https://github.com/coleta-florestal/Back-End/commit/d2933e85a5ad0f228df00b94e91a8db4c5cc2233))
+- **plots:** create plots find by farm id method and end point ([6d7eac1](https://github.com/coleta-florestal/Back-End/commit/6d7eac1546920a94563b3b3403e1bf798887cac9))
+- **prisma:** add description field in plots ([aaf929e](https://github.com/coleta-florestal/Back-End/commit/aaf929e12fdf3ed32aa5d75418e4d05eafa80e43))
+- **prisma:** add new params to farm model ([65ff5b1](https://github.com/coleta-florestal/Back-End/commit/65ff5b1be707965591bf7960436e43783df66473))
+- **prisma:** add plots array to farms ([e2e7472](https://github.com/coleta-florestal/Back-End/commit/e2e74727d1d14fde21a097a0d1d9de445d1aa3f5))
+- **prisma:** add plots status enum ([3fc66ef](https://github.com/coleta-florestal/Back-End/commit/3fc66ef05c4e32fa6aed451775cf5bbe15f255de))
+- **prisma:** add relation between all tables ([c638f57](https://github.com/coleta-florestal/Back-End/commit/c638f571edea41c4f2bf901e7624e2f25b299d6a))
+- **prisma:** add superadmin role to users ([cc3fe80](https://github.com/coleta-florestal/Back-End/commit/cc3fe8093bbf15f939d68b2ea34a1a5492b195e7))
+- **prisma:** change the optional assigne from area in plots ([348a1eb](https://github.com/coleta-florestal/Back-End/commit/348a1ebd36b562473789a5c8aba619c01a3c9fc7))
+- **prisma:** create farm model ([e090a64](https://github.com/coleta-florestal/Back-End/commit/e090a6462040eac24208d7717cdba262011b05df))
+- **prisma:** create plot model ([b6c38a0](https://github.com/coleta-florestal/Back-End/commit/b6c38a03fc4f8fd1c10fc1df07603039ec6b59dc))
+- **prisma:** create subplot model ([564c969](https://github.com/coleta-florestal/Back-End/commit/564c969b324ad1b36cd5f13d00496f843364f73e))
+- **prisma:** create tree model ([222af14](https://github.com/coleta-florestal/Back-End/commit/222af14e930a98127a044b023e65d6e2e10bd405))
+- **profile:** create profile module ([b7ee55c](https://github.com/coleta-florestal/Back-End/commit/b7ee55cb05a2e108666b872ac61cec34423d1d81))
 - signup and signin methods with dto's ([0ea3d2d](https://github.com/coleta-florestal/Back-End/commit/0ea3d2dec8d58f3a70b81c0dbe7196eee2a478dd))
+- **subplot:** add subplot controller module ([b441a5b](https://github.com/coleta-florestal/Back-End/commit/b441a5b2395d103358604a7fb37628784a9907fc))
+- **subplot:** add subplot creation dto ([c1aa543](https://github.com/coleta-florestal/Back-End/commit/c1aa543d9bc066533649fd0e041a15fa8233edb5))
+- **subplot:** add update subplot status dto ([aed2b6e](https://github.com/coleta-florestal/Back-End/commit/aed2b6e1139f33a5dbcaea926c9f3bffe3da5697))
+- **subplot:** fix import subplot module ([75c30e2](https://github.com/coleta-florestal/Back-End/commit/75c30e294f774b874d3e8d034dafb7b656bfe69b))
+- **subplots:** add more subplots structures schema ([2794160](https://github.com/coleta-florestal/Back-End/commit/279416015f0b134e9b04d07022872e34f616971a))
+- **subplots:** add subplots service ([b075d58](https://github.com/coleta-florestal/Back-End/commit/b075d5853b5496606de3cfea6498e82032264278))
+- **trees:** add schema structure and trees dtos ([3f514ee](https://github.com/coleta-florestal/Back-End/commit/3f514eeab2a1cd818e8aaad22f106934bb498eb2))
+- **trees:** add trees controller with routes ([c8c5a2b](https://github.com/coleta-florestal/Back-End/commit/c8c5a2b8b4ac862229a520b9c52c854e9fafa6cc))
+- **trees:** add trees service with methods ([cfde71d](https://github.com/coleta-florestal/Back-End/commit/cfde71d329d3d3c694c75dea319f7a719951a3a6))
+- **user:** update search methods ([9921b13](https://github.com/coleta-florestal/Back-End/commit/9921b13a17e3de63b5feca6981bed668077d708c))
+- **validations:** create validations module ([7b23fc5](https://github.com/coleta-florestal/Back-End/commit/7b23fc55185cf10340c149a8435a18d5fa83ac42))
 
 # 1.0.0 (2026-10-27)
 
