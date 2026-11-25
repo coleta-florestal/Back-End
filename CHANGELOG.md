@@ -1,3 +1,9 @@
+# [1.0.0-rc.12](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.11...v1.0.0-rc.12) (2026-11-25)
+
+### Bug Fixes
+
+- docker file modifications ([f653f1f](https://github.com/coleta-florestal/Back-End/commit/f653f1fb0836e6d48efb83442a50119304e6f6d4))
+
 # [1.0.0-rc.11](https://github.com/coleta-florestal/Back-End/compare/v1.0.0-rc.10...v1.0.0-rc.11) (2026-11-23)
 
 ### Features
