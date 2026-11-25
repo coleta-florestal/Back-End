@@ -16,7 +16,8 @@ export class CreateTreeDto {
   // Altura da árvore, em metros.
   @IsNumber()
   @IsPositive()
-  height!: number;
+  @IsOptional()
+  height?: number;
 
   // Classificação da qualidade da árvore.
   @IsOptional()
