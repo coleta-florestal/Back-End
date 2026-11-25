@@ -1,3 +1,15 @@
+# [1.1.0-rc.2](https://github.com/coleta-florestal/Back-End/compare/v1.1.0-rc.1...v1.1.0-rc.2) (2026-11-25)
+
+### Bug Fixes
+
+- **processing:** update estimatedHeight and add upgrade ([8cc7a03](https://github.com/coleta-florestal/Back-End/commit/8cc7a03303eeb03ba7773fe26a770c76f685601b))
+- **processing:** update the denominator parameters ([733eb4d](https://github.com/coleta-florestal/Back-End/commit/733eb4dfa6f30331d8075de0ebe2eebac3e481d4))
+
+### Features
+
+- **processing:** add hypsometric service ([96e26b4](https://github.com/coleta-florestal/Back-End/commit/96e26b4cb2bbd9d1728951c19a1802c5e725055b))
+- **processing:** add hypsometric to pipeline ([dc36f7d](https://github.com/coleta-florestal/Back-End/commit/dc36f7da17aed94ee9933f911081e1b6b85d23af))
+
 # [1.1.0-rc.1](https://github.com/coleta-florestal/Back-End/compare/v1.0.0...v1.1.0-rc.1) (2026-11-25)
 
 ### Bug Fixes
