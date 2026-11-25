@@ -51,15 +51,24 @@ export class HypsometricService {
     return { a, b };
   }
   estimateHeight(diameterDapCm: number, a: number, b: number) {
+    if (
+      !Number.isFinite(diameterDapCm) ||
+      !Number.isFinite(a) ||
+      !Number.isFinite(b) ||
+      diameterDapCm <= 0
+    ) {
+      throw new BadRequestException('Não foi possível estimar a altura com os valores fornecidos.');
+    }
+
     const denominator = a + b * diameterDapCm;
 
-    if (diameterDapCm <= 0 || denominator === 0) {
+    if (!Number.isFinite(denominator) || denominator === 0) {
       throw new BadRequestException('Não foi possível estimar a altura com os valores fornecidos.');
     }
 
     const height = 1.3 + (diameterDapCm / denominator) ** 2;
 
-    if (!Number.isFinite(height) || height <= 0) {
+    if (!Number.isFinite(height) || height <= 1.3) {
       throw new BadRequestException(
         'O modelo hipsométrico gerou uma estimativa de altura inválida.',
       );
