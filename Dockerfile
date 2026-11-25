@@ -30,6 +30,9 @@ RUN apk add --no-cache openssl
 COPY --from=builder --chown=node:node /app/package*.json ./
 COPY --from=builder --chown=node:node /app/node_modules ./node_modules
 COPY --from=builder --chown=node:node /app/dist ./dist
+# Necessários para aplicar as migrations a partir da imagem (npm run db:deploy).
+COPY --from=builder --chown=node:node /app/prisma ./prisma
+COPY --from=builder --chown=node:node /app/prisma7.config.ts ./
 
 USER node
 
