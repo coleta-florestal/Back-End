@@ -758,6 +758,22 @@ export class ProcessingService {
       })),
     );
 
+    const heightSummary = {
+      measured: allProcessedTrees.filter((t) => t.heightSource === 'MEASURED').length,
+      estimated: allProcessedTrees.filter((t) => t.heightSource === 'ESTIMATED').length,
+      missing: allProcessedTrees.filter((t) => t.heightSource === 'MISSING').length,
+    };
+
+    const equationRequiresHeight =
+      equation.modelType === EquationType.SCHUMACHER_HALL ||
+      equation.modelType === EquationType.SPURR;
+
+    if (equationRequiresHeight && heightSummary.missing > 0) {
+      hypsometricWarnings.push(
+        `${heightSummary.missing} árvore(s) sem altura foram excluídas do cálculo: o modelo selecionado exige altura e não foi possível estimá-la.`,
+      );
+    }
+
     return {
       stage: 'COMPLETED',
       context: {
@@ -793,6 +809,8 @@ export class ProcessingService {
       diameterClasses,
       plots,
       subPlots: subPlotsResults,
+      heightSummary,
+      hypsometricWarnings,
     };
   }
 }
