@@ -117,6 +117,12 @@ export interface ProcessingTotals {
   estimatedTotalVolumeUpperM3?: number | null;
 }
 
+export interface HeightSummary {
+  measured: number;
+  estimated: number;
+  missing: number;
+}
+
 export interface InventoryProcessingResult {
   stage: 'COMPLETED';
   context: ProcessingContext;
@@ -129,4 +135,6 @@ export interface InventoryProcessingResult {
   diameterClasses: DiameterClassResult[];
   plots: PlotProcessingResult[];
   subPlots: SubPlotProcessingResult[];
+  heightSummary: HeightSummary;
+  hypsometricWarnings: string[];
 }

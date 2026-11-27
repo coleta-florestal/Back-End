@@ -11,7 +11,7 @@ export class HypsometricService {
 
     if (measuredTrees.length < this.MINIMUM_MEASURED_TREES) {
       throw new BadRequestException(
-        'Não há árvores com altura e DAP válidos suficientes para ajustar o modelo hipsométrico.',
+        `Apenas ${measuredTrees.length} árvore(s) com altura e DAP válidos; o mínimo para ajustar o modelo hipsométrico é ${this.MINIMUM_MEASURED_TREES}.`,
       );
     }
 
