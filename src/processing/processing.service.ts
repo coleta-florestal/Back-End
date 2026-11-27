@@ -372,8 +372,10 @@ export class ProcessingService {
       }
     }
 
-    // Ajuste hipsométrico por talhão
+    // Ajuste hipsométrico por talhão (com modelo global da amostra como reserva)
+    const hypsometricWarnings: string[] = [];
     const hypsometricModels = new Map<string, { a: number; b: number }>();
+    const plotLabels = new Map<string, string>();
 
     const plotTreeGroups = new Map<
       string,
@@ -393,16 +395,34 @@ export class ProcessingService {
       );
 
       plotTreeGroups.set(groupKey, group);
+      plotLabels.set(groupKey, subPlot.plotName ?? contextInput.plotName);
     }
+
+    let globalModel: { a: number; b: number } | null = null;
 
     if (equation.modelType !== EquationType.HUSCH) {
       for (const [groupKey, trees] of plotTreeGroups) {
         try {
-          const model = this.hypsometricService.fitNaslundModel(trees);
-          hypsometricModels.set(groupKey, model);
+          hypsometricModels.set(groupKey, this.hypsometricService.fitNaslundModel(trees));
+        } catch (err: unknown) {
+          const reason = err instanceof Error ? err.message : 'erro desconhecido';
+          hypsometricWarnings.push(
+            `Talhão "${plotLabels.get(groupKey)}": modelo hipsométrico próprio não ajustado. ${reason}`,
+          );
+        }
+      }
+
+      // Reserva: talhões sem modelo próprio tentam um modelo com todas as árvores medidas da amostra
+      if (hypsometricModels.size < plotTreeGroups.size) {
+        try {
+          globalModel = this.hypsometricService.fitNaslundModel(
+            [...plotTreeGroups.values()].flat(),
+          );
+          hypsometricWarnings.push(
+            'Talhões sem modelo próprio usaram o modelo hipsométrico global da amostra.',
+          );
         } catch {
-          // Não ajusta o modelo quando não existem observações suficientes
-          // ou quando os dados não permitem o ajuste.
+          // Sem observações suficientes nem no conjunto todo: segue sem estimar.
         }
       }
     }
@@ -410,7 +430,7 @@ export class ProcessingService {
     // Aplicação das alturas estimadas
     for (const subPlot of subPlotsInput) {
       const groupKey = subPlot.plotId ?? subPlot.plotName ?? contextInput.plotName;
-      const model = hypsometricModels.get(groupKey);
+      const model = hypsometricModels.get(groupKey) ?? globalModel;
 
       if (!model) {
         continue;
